@@ -1,0 +1,1679 @@
+body {
+  width: 100%;
+  min-width: 320px;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #fff;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 800px;
+  min-width: 320px;
+  margin: 0 auto;
+}
+
+.group-button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.group-button:hover {
+  opacity: 0.9;
+}
+
+.tab-group {
+  margin-bottom: 24px;
+}
+
+.group-header {
+  background: #000;
+  color: #fff;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  scroll-margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.group-divider {
+  display: none;
+}
+
+.tab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.tab-item:hover {
+  background: #f5f5f5;
+}
+
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-group {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  padding: 16px 16px 8px;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.group-button {
+  flex: 1;
+}
+
+.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.tab-favicon-placeholder {
+  width: 16px;
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 0;
+}
+
+.main-container {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  height: calc(100vh - 120px);
+  position: relative;
+  padding: 16px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.index-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 8px;
+}
+
+.index-item {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.index-item:hover {
+  background: #f0f0f0;
+  color: #000;
+}
+
+.index-item.active {
+  background: #000;
+  color: #fff;
+  box-shadow: none;
+}
+
+.tabs-container {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.favicon-index {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+  padding-right: 2px;
+  margin-right: 2px;
+  border-right: 1px solid #eee;
+  flex: 1;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.favicon-item {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.favicon-item:hover {
+  background: #f0f0f0;
+}
+
+.favicon-item.active {
+  background: #000;
+}
+
+.favicon-item img,
+.favicon-item .favicon-placeholder {
+  width: 14px;
+  height: 14px;
+}
+
+/* 移除悬浮提示 */
+.favicon-item:hover::after {
+  display: none;
+}
+
+/* 添加分享按钮样式 */
+.share-button {
+  display: none;
+}
+
+/* 设置面板样式 */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.settings-dialog {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.settings-header {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.close-settings {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  color: #666;
+}
+
+.close-settings:hover {
+  color: #000;
+}
+
+.settings-content {
+  padding: 16px;
+}
+
+.setting-item {
+  margin-bottom: 16px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.setting-item select {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px 8px;
+  height: 28px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.setting-item select:hover {
+  background: #f5f5f5;
+}
+
+/* 深色模式 */
+.dark-mode .setting-item select {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode .setting-item select:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode .setting-item select option {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+/* 深色模式样式 */
+.dark-mode .settings-dialog {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+.dark-mode .settings-header {
+  border-bottom-color: #444;
+}
+
+.dark-mode .close-settings {
+  color: #999;
+}
+
+.dark-mode .close-settings:hover {
+  color: #fff;
+}
+
+.dark-mode .setting-item select {
+  background: #3d3d3d;
+  border-color: #555;
+  color: #fff;
+}
+
+.dark-mode .setting-item select option {
+  background: #3d3d3d;
+}
+
+.settings-footer {
+  padding: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.settings-footer button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#cancelSettings, #saveSettings {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+}
+
+#cancelSettings:hover, #saveSettings:hover {
+  background: #f5f5f5;
+}
+
+/* 深色模式 */
+.dark-mode #cancelSettings, 
+.dark-mode #saveSettings {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #cancelSettings:hover, 
+.dark-mode #saveSettings:hover {
+  background: #3d3d3d;
+}
+
+/* 修改分享工具栏样式 */
+.share-toolbar {
+  background: #fff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.share-action-button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 0;
+}
+
+/* 可选择状态的标签页样式 */
+.share-mode .tab-item {
+  position: relative;
+  padding-left: 32px !important;
+  cursor: pointer;
+}
+
+.share-mode .tab-item::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-radius: 0;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.share-mode .tab-item.selected::before {
+  background: #000;
+  border-color: #000;
+}
+
+.share-mode .tab-item.selected::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 4px;
+  border: 2px solid #fff;
+  border-top: 0;
+  border-right: 0;
+}
+
+/* 添加置顶按钮样式 */
+.pin-button {
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-item:hover .pin-button {
+  opacity: 1;
+}
+
+.pin-button:hover {
+  background: #f0f0f0;
+}
+
+.pin-button svg {
+  width: 12px;
+  height: 12px;
+  fill: #666;
+}
+
+/* 置顶标签样式 */
+.tab-item.pinned {
+  background: #f8f8f8;
+  border-left: 2px solid #000;
+  margin-left: -2px;
+}
+
+.tab-item.pinned .pin-button {
+  opacity: 1;
+}
+
+.tab-item.pinned .pin-button svg {
+  fill: #000;
+}
+
+/* 修改侧边栏样式 */
+.side-panel {
+  flex-shrink: 0;
+  width: 28px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.side-panel.right {
+  position: fixed;
+  right: 16px;
+  top: 120px;
+  width: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  z-index: 100;
+  display: none;
+}
+
+/* 当启用字母索引时显示 */
+.letter-index-enabled .side-panel.right {
+  display: block;
+}
+
+/* 修改索引组样式 */
+.index-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+/* 移除索引标题相关样式 */
+.index-header {
+  display: none;
+}
+
+/* 修改索引容器样式 */
+.favicon-index,
+.index-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 操作按钮容器样式 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #eee;
+  margin-top: auto;
+  background: #fff;
+}
+
+/* 新建标签页按钮容器 */
+.new-tab-container {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+/* 新建标签页按钮样式 */
+.new-tab-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.new-tab-button:hover {
+  transform: scale(1.05);
+}
+
+.new-tab-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 修改分享按钮在分享模式下的样式 */
+.share-mode .icon-button {
+  display: flex !important; /* 覆盖之前的 display: none */
+  background: #000;
+  color: #fff;
+}
+
+/* 修改分享工具栏样式 */
+.share-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.05);
+  z-index: 1000;
+}
+
+.share-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 1001;
+}
+
+.share-action-button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 0;
+  min-width: 80px;
+  text-align: center;
+}
+
+.share-action-button:hover {
+  opacity: 0.9;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #666;
+  margin-left: 8px;
+}
+
+/* 移除旧的分享按钮样式 */
+.share-button {
+  display: none;
+}
+
+/* 图标按钮样式 */
+.icon-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.icon-button:hover {
+  transform: scale(1.05);
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 搜索栏样式 */
+.search-bar {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #eee;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-radius: 0;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: #666;
+}
+
+.search-input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #000;
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+/* 搜索结果高亮样式 */
+.highlight {
+  background: #fff3b0;
+  border-radius: 2px;
+}
+
+/* 隐藏不匹配的标签页 */
+.tab-item.hidden {
+  display: none;
+}
+
+/* 隐藏空分组 */
+.tab-group:empty {
+  display: none;
+}
+
+/* 添加滚动条样式 */
+.tabs-container::-webkit-scrollbar,
+.favicon-index::-webkit-scrollbar,
+.index-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb,
+.favicon-index::-webkit-scrollbar-thumb,
+.index-container::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+
+.tabs-container::-webkit-scrollbar-track,
+.favicon-index::-webkit-scrollbar-track,
+.index-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 当内容较少时保持索引容器的最小高度 */
+.index-group {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.index-header {
+  flex-shrink: 0;
+}
+
+/* 修改分享按钮在分享模式下的样式 */
+.share-mode .icon-button {
+  display: flex !important; /* 覆盖之前的 display: none */
+  background: #000;
+  color: #fff;
+}
+
+/* 修改分享工具栏样式 */
+.share-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.05);
+  z-index: 1000;
+}
+
+.share-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 1001;
+}
+
+.share-action-button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 0;
+  min-width: 80px;
+  text-align: center;
+}
+
+.share-action-button:hover {
+  opacity: 0.9;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #666;
+  margin-left: 8px;
+}
+
+/* 移除旧的分享按钮样式 */
+.share-button {
+  display: none;
+}
+
+/* 移除所有按钮的圆角 */
+.group-button,
+.icon-button,
+.new-tab-button,
+.share-action-button,
+.search-input {
+  border-radius: 0;
+}
+
+/* 移除索引项的圆角 */
+.index-item {
+  border-radius: 0;
+}
+
+/* 移除设置面板的圆角 */
+.settings-panel {
+  border-radius: 0;
+}
+
+/* 移除 favicon 占位符的圆角 */
+.tab-favicon-placeholder,
+.favicon-item .favicon-placeholder {
+  border-radius: 0;
+}
+
+/* 移除分享模式下复选框的圆角 */
+.share-mode .tab-item::before {
+  border-radius: 0;
+}
+
+/* 移除悬浮提示的圆角 */
+.favicon-item:hover::after {
+  border-radius: 0;
+}
+
+/* 修改字母索引容器样式 */
+.side-panel.right .index-group {
+  margin: 0;
+  min-height: auto;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 修改字母索引项样式 */
+.side-panel.right .index-item {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.side-panel.right .index-item:hover {
+  background: #f0f0f0;
+}
+
+.side-panel.right .index-item.active {
+  background: #000;
+  color: #fff;
+}
+
+/* 修改标签页容器样式 */
+.tabs-container {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 0;
+  margin-right: 0;
+}
+
+/* 移除之前为字母索引预留的空间 */
+.tabs-container {
+  margin-right: 0 !important;
+}
+
+/* 修改主容器布局 */
+.main-container {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  height: calc(100vh - 120px);
+  position: relative;
+  padding: 16px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 标签页操作按钮容器 */
+.tab-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* 关闭按钮样式 */
+.close-button {
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-item:hover .close-button {
+  opacity: 1;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+}
+
+.close-button svg {
+  width: 12px;
+  height: 12px;
+  color: #666;
+}
+
+/* 调整置顶按钮样式 */
+.pin-button {
+  margin-left: 0;
+}
+
+/* 标签页悬停时显示所有操作按钮 */
+.tab-item:hover .pin-button,
+.tab-item:hover .close-button {
+  opacity: 1;
+}
+
+/* 已置顶标签页的按钮始终显示 */
+.tab-item.pinned .pin-button {
+  opacity: 1;
+}
+
+/* 分组关闭按钮样式 */
+.group-close-button {
+  width: 16px;
+  height: 16px;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.group-header:hover .group-close-button {
+  opacity: 1;
+}
+
+.group-close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.group-close-button svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+/* 当前标签页高亮样式 */
+.tab-item.active {
+  background: #f0f0f0;
+  border-left: 2px solid #000;
+  margin-left: -2px;
+  padding-left: 2px;
+}
+
+/* 当标签页同时是置顶和当前动状态时的样式 */
+.tab-item.pinned.active {
+  background: #e8e8e8;
+  border-left: 2px solid #000;
+}
+
+/* 排序选择器样式 */
+.sort-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 6px 24px 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  font-size: 13px;
+  color: #666;
+  background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>') no-repeat;
+  background-position: right 6px center;
+  background-size: 16px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.sort-select:focus {
+  border-color: #000;
+}
+
+/* 修改下拉箭头颜色 */
+.sort-select:focus {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23000" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>');
+}
+
+/* 显示部按钮样式 */
+.favicon-item.show-all {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+}
+
+.favicon-item.show-all svg {
+  width: 16px;
+  height: 16px;
+  color: #666;
+}
+
+.favicon-item.show-all:hover svg {
+  color: #000;
+}
+
+/* 标签列表顶部栏样式 */
+.tabs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tabs-divider {
+  flex: 1;
+  height: 1px;
+  background: #000;
+}
+
+.clear-button {
+  font-size: 13px;
+  color: #666;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.clear-button:hover {
+  color: #000;
+}
+
+/* 深色模式基础样式 */
+body.dark-mode {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+/* 深色模式按钮样式 */
+.dark-mode .group-button {
+  background: #333;
+  color: #fff;
+}
+
+.dark-mode .group-button:hover {
+  background: #444;
+}
+
+/* 深色模式标签项样式 */
+.dark-mode .tab-item {
+  color: #e0e0e0;
+}
+
+.dark-mode .tab-item:hover {
+  background: #2a2a2a;
+}
+
+.dark-mode .tab-item.active {
+  background: #333;
+}
+
+/* 深色模式组标题样式 */
+.dark-mode .group-header {
+  background: #333;
+  color: #fff;
+}
+
+/* 深色模式索引样式 */
+.dark-mode .index-item {
+  background: #2a2a2a;
+  color: #999;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.dark-mode .index-item:hover {
+  background: #333;
+  color: #fff;
+}
+
+.dark-mode .index-item.active {
+  background: #444;
+  color: #fff;
+}
+
+/* 深色模式图标索引样式 */
+.dark-mode .favicon-index {
+  border-right-color: #333;
+}
+
+.dark-mode .favicon-item:hover {
+  background: #2a2a2a;
+}
+
+.dark-mode .favicon-item.active {
+  background: #333;
+}
+
+/* 深色模式搜索栏样式 */
+.dark-mode .search-input-wrapper {
+  border-radius: 0;
+  background: #2d2d2d;
+  border: 1px solid #666 !important;
+}
+
+.dark-mode .search-input {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #666 !important;
+  border-radius: 0 !important;
+}
+
+.dark-mode .search-input:focus {
+  border-color: #888 !important;
+  outline: none;
+  border-radius: 0 !important;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #888;
+}
+
+.dark-mode .search-icon {
+  stroke: #888;
+}
+
+/* 深色模式排序选择器样式 */
+.dark-mode .sort-select {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode .sort-select:focus {
+  border-color: #444;
+  background: #333;
+}
+
+/* 深色模式设置面板样式 */
+.dark-mode .settings-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .settings-dialog {
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .settings-header {
+  border-bottom-color: #333;
+}
+
+.dark-mode .settings-header h2 {
+  color: #fff;
+}
+
+.dark-mode .setting-item label {
+  color: #e0e0e0;
+}
+
+.dark-mode .setting-item select {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode .setting-item select:focus {
+  border-color: #444;
+  background: #333;
+}
+
+.dark-mode #saveSettings {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode #saveSettings:hover {
+  background: #333;
+}
+
+.dark-mode #cancelSettings {
+  background: transparent;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode #cancelSettings:hover {
+  background: #2a2a2a;
+}
+
+/* 深色模式���享工具栏样式 */
+.dark-mode .share-toolbar {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+.dark-mode .share-action-button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode .share-action-button:hover {
+  background: #333;
+}
+
+.dark-mode .selected-count {
+  color: #999;
+}
+
+/* 深色模式滚动条样式 */
+.dark-mode .tabs-container::-webkit-scrollbar-thumb {
+  background-color: #333;
+}
+
+.dark-mode .tabs-container::-webkit-scrollbar-track {
+  background-color: #1a1a1a;
+}
+
+/* 深色模式图标按钮样式 */
+.dark-mode .icon-button {
+  color: #e0e0e0;
+}
+
+.dark-mode .icon-button:hover {
+  background: #2a2a2a;
+}
+
+/* 深色模式关闭按钮样式 */
+.dark-mode .close-button {
+  color: #999;
+}
+
+.dark-mode .close-button:hover {
+  color: #fff;
+  background: #444;
+}
+
+/* 深色模式置顶按钮样式 */
+.dark-mode .pin-button {
+  color: #999;
+}
+
+.dark-mode .pin-button:hover {
+  color: #fff;
+  background: #444;
+}
+
+.dark-mode .tab-item.pinned {
+  background: #2a2a2a;
+}
+
+/* 深色模式分组关闭按钮样式 */
+.dark-mode .group-close-button {
+  color: #999;
+}
+
+.dark-mode .group-close-button:hover {
+  color: #fff;
+  background: #444;
+}
+
+/* 深色模式清除按钮样式 */
+.dark-mode .clear-button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+.dark-mode .clear-button:hover {
+  background: #333;
+}
+
+/* 深色模式顶部按钮组样式 */
+.dark-mode .button-group {
+  background: #1a1a1a;
+  padding: 16px 16px 12px;
+  border-bottom: none !important;
+}
+
+.dark-mode .group-button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  transition: all 0.2s ease;
+}
+
+.dark-mode .group-button:hover {
+  background: #333;
+  border-color: #444;
+}
+
+.dark-mode .group-button.active {
+  background: #444;
+  color: #fff;
+  border-color: #555;
+}
+
+/* 深色模式新建标签页按钮样式 */
+.dark-mode .new-tab-container {
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+}
+
+.dark-mode .new-tab-button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  transition: all 0.2s ease;
+}
+
+.dark-mode .new-tab-button:hover {
+  background: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.dark-mode .new-tab-button svg {
+  stroke: currentColor;
+}
+
+/* 深色模式操作按钮区域样式 */
+.dark-mode .action-buttons {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.dark-mode .icon-button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #333;
+  transition: all 0.2s ease;
+}
+
+.dark-mode .icon-button:hover {
+  background: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+.dark-mode .icon-button svg {
+  stroke: currentColor;
+}
+
+/* 深色模式分享和设置按钮特殊样式 */
+.dark-mode #shareButton,
+.dark-mode #settingsButton {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+.dark-mode #shareButton:hover,
+.dark-mode #settingsButton:hover {
+  background: #333;
+  color: #fff;
+  border-color: #444;
+}
+
+/* 深色模式按钮激活状态 */
+.dark-mode .group-button:active,
+.dark-mode .new-tab-button:active,
+.dark-mode .icon-button:active {
+  background: #444;
+  border-color: #555;
+  transform: translateY(1px);
+}
+
+/* 深色模式搜索栏容器样式 */
+.dark-mode .search-bar {
+  background: #1a1a1a;
+  border-bottom: none;
+}
+
+/* 深色模式侧边栏样式 */
+.dark-mode .side-panel {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+/* 深色模式分隔线样式 */
+.dark-mode .tabs-divider {
+  background: #333;
+}
+
+/* 深色模式滚动条样式 */
+.dark-mode .favicon-index::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dark-mode .favicon-index::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 2px;
+}
+
+.dark-mode .favicon-index::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 2px;
+}
+
+.dark-mode .favicon-index::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 深色模式下图标索引容器样式优化 */
+.dark-mode .favicon-index {
+  border-right: 1px solid #333;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
+}
+
+/* 深色模式下主内容区域滚动条样式统一 */
+.dark-mode .tabs-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-mode .tabs-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.dark-mode .tabs-container::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.dark-mode .tabs-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark-mode .tabs-container {
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
+}
+
+/* 深色模式顶部按钮组样式 */
+.dark-mode .button-group {
+  background: #1a1a1a;
+  padding: 16px 16px 12px;
+  border-bottom: none !important;
+}
+
+/* 深色模式搜索栏容器样式 */
+.dark-mode .search-bar {
+  background: #1a1a1a;
+  border-bottom: none;
+}
+
+/* 调整搜索框间距 */
+.dark-mode .search-input-wrapper {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+.dark-mode .search-input {
+  background: transparent;
+  border: none;
+}
+
+.dark-mode .search-input:focus {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.dark-mode .sort-wrapper {
+  margin-top: 8px;
+}
+
+.dark-mode .sort-select {
+  background-color: #2a2a2a;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+/* 深色模式下移除所有圆角 */
+.dark-mode .settings-dialog,
+.dark-mode .index-item,
+.dark-mode .group-button,
+.dark-mode .search-input,
+.dark-mode .sort-select,
+.dark-mode .new-tab-button,
+.dark-mode .icon-button,
+.dark-mode #shareButton,
+.dark-mode #settingsButton,
+.dark-mode .share-action-button,
+.dark-mode .close-button,
+.dark-mode .pin-button,
+.dark-mode .group-close-button,
+.dark-mode .clear-button,
+.dark-mode .setting-item select,
+.dark-mode .tabs-container::-webkit-scrollbar,
+.dark-mode .tabs-container::-webkit-scrollbar-track,
+.dark-mode .tabs-container::-webkit-scrollbar-thumb,
+.dark-mode .favicon-index::-webkit-scrollbar,
+.dark-mode .favicon-index::-webkit-scrollbar-track,
+.dark-mode .favicon-index::-webkit-scrollbar-thumb {
+  border-radius: 0;
+}
+
+/* 深色模式搜索框样式 */
+.dark-mode .search-input {
+  border-radius: 0;
+}
+
+#newTabButton,
+#shareButton,
+#settingsButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+}
+
+#newTabButton:hover,
+#shareButton:hover,
+#settingsButton:hover {
+  background: #f5f5f5;
+}
+
+#newTabButton svg,
+#shareButton svg,
+#settingsButton svg {
+  width: 18px;
+  height: 18px;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+
+/* 深色模式 */
+.dark-mode #newTabButton,
+.dark-mode #shareButton,
+.dark-mode #settingsButton {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #newTabButton:hover,
+.dark-mode #shareButton:hover,
+.dark-mode #settingsButton:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #newTabButton svg,
+.dark-mode #shareButton svg,
+.dark-mode #settingsButton svg {
+  stroke: #fff;
+}
+
+#defaultView,
+#groupTabs,
+#aiGroupTabs {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 28px;
+  box-sizing: border-box;
+  width: 100px;
+  margin: 0 2px;
+}
+
+#defaultView:hover,
+#groupTabs:hover,
+#aiGroupTabs:hover {
+  background: #f5f5f5;
+}
+
+#defaultView.active,
+#groupTabs.active,
+#aiGroupTabs.active {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+/* 深色模式 */
+.dark-mode #defaultView,
+.dark-mode #groupTabs,
+.dark-mode #aiGroupTabs {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #defaultView:hover,
+.dark-mode #groupTabs:hover,
+.dark-mode #aiGroupTabs:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #defaultView.active,
+.dark-mode #groupTabs.active,
+.dark-mode #aiGroupTabs.active {
+  background: #fff;
+  color: #000;
+  border: 1px solid #fff;
+}
+
+/* 深色模式搜索框样式 */
+.dark-mode .search-input-wrapper {
+  border-radius: 0;
+  background: #2d2d2d;
+  border: 1px solid #fff;
+}
+
+.dark-mode .search-input {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 0 !important;
+}
+
+.dark-mode .search-input:focus {
+  border-color: #fff;
+  outline: none;
+  border-radius: 0 !important;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #888;
+}
+
+.dark-mode .search-icon {
+  stroke: #fff;
+}

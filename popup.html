@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="button-group">
+      <button id="defaultView" class="group-button">默认列表</button>
+      <button id="groupTabs" class="group-button">按域名分组</button>
+      <button id="aiGroupTabs" class="group-button">AI智能分组</button>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"/>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="搜索标签页...">
+      </div>
+      <div class="sort-wrapper">
+        <select id="sortSelect" class="sort-select">
+          <option value="default">默认排序</option>
+          <option value="time-asc">打开时间 ↑</option>
+          <option value="time-desc">打开时间 ↓</option>
+          <option value="freq-asc">使用频率 ↑</option>
+          <option value="freq-desc">使用频率 ↓</option>
+        </select>
+      </div>
+    </div>
+    <div class="main-container">
+      <div class="side-panel">
+        <div class="new-tab-container">
+          <button class="new-tab-button" id="newTabButton" title="新建标签页">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+        <div class="index-group">
+          <div class="favicon-index" id="faviconIndex"></div>
+        </div>
+        <div class="action-buttons">
+          <button id="shareButton" class="icon-button" title="分享标签页">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
+            </svg>
+          </button>
+          <button id="settingsButton" class="icon-button" title="设置">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="tabs-container" id="tabGroups"></div>
+      <div class="side-panel right">
+        <div class="index-group">
+          <div class="index-container" id="letterIndex"></div>
+        </div>
+      </div>
+    </div>
+    <!-- 设置面板 -->
+    <div class="settings-overlay" id="settingsOverlay" style="display: none;">
+      <div class="settings-dialog">
+        <div class="settings-header">
+          <h2>设置</h2>
+          <button class="close-settings">×</button>
+        </div>
+        <div class="settings-content">
+          <!-- 主题设置 -->
+          <div class="setting-item">
+            <label>主题模式</label>
+            <select id="themeMode">
+              <option value="auto">自动</option>
+              <option value="light">浅色</option>
+              <option value="dark">深色</option>
+            </select>
+          </div>
+          
+          <!-- 默认视图设置 -->
+          <div class="setting-item">
+            <label>默认视图</label>
+            <select id="defaultView">
+              <option value="default">默认列表</option>
+              <option value="domain">按域名分组</option>
+              <option value="ai">AI智能分组</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-footer">
+          <button id="cancelSettings">取消</button>
+          <button id="saveSettings">保存</button>
+        </div>
+      </div>
+    </div>
+    <!-- 分享面板 -->
+    <div class="share-overlay" id="shareOverlay" style="display: none;">
+      <div class="share-toolbar">
+        <button class="share-action-button" id="copySelected">复制链接</button>
+        <button class="share-action-button" id="cancelShare">取消</button>
+        <span class="selected-count" id="selectedCount">选择 0 项</span>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
