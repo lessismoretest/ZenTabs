@@ -58,12 +58,12 @@ body {
 }
 
 .tab-item {
+  position: relative;
+  padding: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
   cursor: pointer;
-  min-width: 0;
 }
 
 .tab-item:hover {
@@ -836,7 +836,7 @@ body {
   border-radius: 0;
 }
 
-/* 移除分享模式下复选框的圆角 */
+/* 移除分享模式选的圆角 */
 .share-mode .tab-item::before {
   border-radius: 0;
 }
@@ -904,7 +904,8 @@ body {
   display: flex;
   gap: 4px;
   margin-left: auto;
-  flex-shrink: 0;
+  align-items: center;
+  position: relative;
 }
 
 /* 关闭按钮样式 */
@@ -945,7 +946,7 @@ body {
   opacity: 1;
 }
 
-/* 已置顶标签页的按钮始终显示 */
+/* 已顶标签页的按钮始终显示 */
 .tab-item.pinned .pin-button {
   opacity: 1;
 }
@@ -985,7 +986,7 @@ body {
   padding-left: 2px;
 }
 
-/* 当标签页同时是置顶和当前动状态时的样式 */
+/* 当标签页同时是置顶和当前动状态时样��� */
 .tab-item.pinned.active {
   background: #e8e8e8;
   border-left: 2px solid #000;
@@ -1225,7 +1226,7 @@ body.dark-mode {
   background: #2a2a2a;
 }
 
-/* 深色模式���享工具栏样式 */
+/* 深色模式分享工具栏样式 */
 .dark-mode .share-toolbar {
   background: #1a1a1a;
   border-color: #333;
@@ -1439,7 +1440,7 @@ body.dark-mode {
   background: #555;
 }
 
-/* 深色模式下图标索引容器样式优化 */
+/* 深色模式图标索引容器样式优化 */
 .dark-mode .favicon-index {
   border-right: 1px solid #333;
   scrollbar-width: thin;
@@ -1676,4 +1677,287 @@ body.dark-mode {
 
 .dark-mode .search-icon {
   stroke: #fff;
+}
+
+/* 标签按钮基础样式 */
+.tag-button {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #999;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+}
+
+/* 标签按钮悬停示 */
+.tab-item:hover .tag-button {
+  opacity: 1;
+}
+
+/* 标签颜色下拉菜单 */
+.tag-dropdown {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-right: 8px;
+}
+
+.tag-dropdown.show {
+  display: flex;
+  gap: 4px;
+}
+
+/* 标签颜色选项 */
+.tag-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.tag-color:hover {
+  transform: scale(1.1);
+}
+
+/* 标签颜色定义 */
+.tag-color.red { background: #ff6b6b; }
+.tag-color.orange { background: #ffa94d; }
+.tag-color.yellow { background: #ffd43b; }
+.tag-color.green { background: #69db7c; }
+.tag-color.blue { background: #4dabf7; }
+.tag-color.purple { background: #da77f2; }
+.tag-color.gray { background: #868e96; }
+
+/* 已选中的标签样式 */
+.tab-item[data-tag-color="red"] .tag-button { border-color: #ff6b6b; background: #ff6b6b; }
+.tab-item[data-tag-color="orange"] .tag-button { border-color: #ffa94d; background: #ffa94d; }
+.tab-item[data-tag-color="yellow"] .tag-button { border-color: #ffd43b; background: #ffd43b; }
+.tab-item[data-tag-color="green"] .tag-button { border-color: #69db7c; background: #69db7c; }
+.tab-item[data-tag-color="blue"] .tag-button { border-color: #4dabf7; background: #4dabf7; }
+.tab-item[data-tag-color="purple"] .tag-button { border-color: #da77f2; background: #da77f2; }
+.tab-item[data-tag-color="gray"] .tag-button { border-color: #868e96; background: #868e96; }
+
+/* 深色模式样式 */
+.dark-mode .tag-dropdown {
+  background: #2d2d2d;
+  border-color: #444;
+}
+
+/* 确保标签页标题不会被操作按钮挤压 */
+.tab-title {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 按钮组通用样式 */
+.tab-actions button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* 覆盖 tag-button 的特定样式 */
+.tab-actions .tag-button {
+  border: 2px solid #999;
+  border-radius: 50%;
+  background: none;
+  opacity: 0;
+}
+
+.tab-item:hover .tab-actions .tag-button {
+  opacity: 1;
+}
+
+/* 已选择颜色的标签按钮始终显示 */
+.tab-item[data-tag-color] .tag-button {
+  opacity: 1 !important;
+}
+
+/* 取消标签按钮样式 */
+.tag-color.clear {
+  border: 2px solid #999;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-color.clear svg {
+  width: 14px;
+  height: 14px;
+  stroke: #999;
+}
+
+.tag-color.clear:hover {
+  border-color: #666;
+}
+
+.tag-color.clear:hover svg {
+  stroke: #666;
+}
+
+/* 深色模式下的取消标签按钮样式 */
+.dark-mode .tag-color.clear {
+  background: #2d2d2d;
+  border-color: #666;
+}
+
+.dark-mode .tag-color.clear svg {
+  stroke: #666;
+}
+
+.dark-mode .tag-color.clear:hover {
+  border-color: #999;
+}
+
+.dark-mode .tag-color.clear:hover svg {
+  stroke: #999;
+}
+
+/* 颜色筛选器样式 */
+.color-filter {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+
+.color-filter-button {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.color-filter-button:hover {
+  transform: scale(1.1);
+}
+
+.color-filter-button.active {
+  border-color: #000;
+  transform: scale(1.1);
+}
+
+/* 颜色定义 */
+.color-filter-button.red { background: #ff6b6b; }
+.color-filter-button.orange { background: #ffa94d; }
+.color-filter-button.yellow { background: #ffd43b; }
+.color-filter-button.green { background: #69db7c; }
+.color-filter-button.blue { background: #4dabf7; }
+.color-filter-button.purple { background: #da77f2; }
+.color-filter-button.gray { background: #868e96; }
+
+/* 深色模式样式 */
+.dark-mode .color-filter-button.active {
+  border-color: #fff;
+}
+
+/* 排序和筛选器容器样式 */
+.sort-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 6px 24px 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  font-size: 13px;
+  color: #666;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+/* 颜色筛选器容器样式 */
+.color-filter {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* 标签页容器包装器 */
+.tabs-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 颜色筛选器容器 */
+.color-filter-container {
+  padding: 4px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 颜色筛选器 */
+.color-filter {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Clear 按钮样式 */
+.clear-button {
+  font-size: 12px;
+  color: #666;
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.clear-button:hover {
+  color: #000;
+}
+
+/* 深色模式样式 */
+.dark-mode .color-filter-container {
+  border-bottom-color: #333;
+}
+
+.dark-mode .clear-button {
+  color: #999;
+}
+
+.dark-mode .clear-button:hover {
+  color: #fff;
 }

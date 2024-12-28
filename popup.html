@@ -20,11 +20,10 @@
       </div>
       <div class="sort-wrapper">
         <select id="sortSelect" class="sort-select">
-          <option value="default">默认排序</option>
-          <option value="time-asc">打开时间 ↑</option>
-          <option value="time-desc">打开时间 ↓</option>
-          <option value="freq-asc">使用频率 ↑</option>
+          <option value="time-desc">时间 ↓</option>
+          <option value="time-asc">时间 ↑</option>
           <option value="freq-desc">使用频率 ↓</option>
+          <option value="freq-asc">使用频率 ↑</option>
         </select>
       </div>
     </div>
@@ -54,7 +53,10 @@
           </button>
         </div>
       </div>
-      <div class="tabs-container" id="tabGroups"></div>
+      <div class="tabs-wrapper">
+        <div class="color-filter-container"></div>
+        <div class="tabs-container" id="tabGroups"></div>
+      </div>
       <div class="side-panel right">
         <div class="index-group">
           <div class="index-container" id="letterIndex"></div>
