@@ -8,15 +8,20 @@
   <div class="container">
     <div class="button-group">
       <button id="defaultView" class="group-button">默认列表</button>
-      <button id="groupTabs" class="group-button">按域名分组</button>
-      <button id="aiGroupTabs" class="group-button">AI智能分组</button>
+      <button id="aiGroupTabs" class="group-button">AI 分组</button>
     </div>
     <div class="search-bar">
       <div class="search-input-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"/>
         </svg>
-        <input type="text" id="searchInput" class="search-input" placeholder="搜索标签页...">
+        <input type="text" id="searchInput" class="search-input" placeholder="搜索或输入网址...">
+        <button class="copy-url-button" title="复制链接">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </button>
       </div>
       <div class="sort-wrapper">
         <select id="sortSelect" class="sort-select">
@@ -40,9 +45,31 @@
           <div class="favicon-index" id="faviconIndex"></div>
         </div>
         <div class="action-buttons">
-          <button id="shareButton" class="icon-button" title="分享标签页">
+          <button id="restoreButton" class="icon-button" title="恢复关闭的标签页">
+            <svg viewBox="0 0 1025 1024" fill="currentColor">
+              <path d="M990.007709 892c-11.2 0-22-5.9-27.8-16.2C841.707709 664.3 672.307709 639.2 448.007709 637.4l0 198.6c0 12.6-7.3 24-18.8 29.1-11.4 5.2-24.8 3.2-34.3-5.1l-384-336c-6.8-6-10.8-14.5-10.9-23.5-0.2-9 3.5-17.7 10.1-23.9l384-360c9.3-8.7 22.9-11.1 34.6-6 11.7 5.1 19.3 16.6 19.3 29.4l0 168.8c100.4 5 191.9 33.7 272.4 85.6 70.8 45.6 133 108.9 184.8 188.2 87.3 133.6 114.9 265.6 116.1 271.1 3.1 15.4-5.4 30.8-20.1 36.3C997.607709 891.3 993.807709 892 990.007709 892zM79.707709 499.1 384.007709 765.4 384.007709 605.2c0-17.7 14.3-32 32-32 136.7 0 247.4 7.2 343.5 42.1 50.9 18.5 95.2 43.8 135.2 77.1-12.5-24.9-27-50.8-44-76.6C744.207709 454 598.007709 372 416.007709 372c-17.7 0-32-14.3-32-32l0-126.2L79.707709 499.1z"/>
+            </svg>
+          </button>
+          <button id="archiveButton" class="icon-button" title="归档标签页">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
+              <path d="M20 6L9 17L4 12"/>
+            </svg>
+          </button>
+          <button id="archiveListButton" class="icon-button" title="已归档">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 8l-5-5H8L3 8v13h18V8zM3 8h18M9 13h6"/>
+            </svg>
+          </button>
+          <button id="audioButton" class="icon-button" title="正在播放">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+          </button>
+          <button id="shareButton" class="icon-button" title="分享标签页">
+            <svg viewBox="0 0 1024 1024" fill="currentColor">
+              <path d="M853.333333 533.333333a32 32 0 0 1 64 0v266.666667c0 64.8-52.533333 117.333333-117.333333 117.333333H224c-64.8 0-117.333333-52.533333-117.333333-117.333333V256c0-64.8 52.533333-117.333333 117.333333-117.333333h277.333333a32 32 0 0 1 0 64H224a53.333333 53.333333 0 0 0-53.333333 53.333333v544a53.333333 53.333333 0 0 0 53.333333 53.333333h576a53.333333 53.333333 0 0 0 53.333333-53.333333V533.333333z m-42.058666-277.333333l-89.792-95.402667a32 32 0 0 1 46.613333-43.861333l140.544 149.333333C927.861333 286.485333 913.376 320 885.333333 320H724.704C643.029333 320 576 391.210667 576 480v192a32 32 0 1 1-64 0V480c0-123.296 94.784-224 212.704-224h86.570667z"/>
             </svg>
           </button>
           <button id="settingsButton" class="icon-button" title="设置">
@@ -90,6 +117,22 @@
               <option value="ai">AI智能分组</option>
             </select>
           </div>
+          
+          <!-- 双击标签页设置 -->
+          <div class="setting-item">
+            <label>双击标签页</label>
+            <select id="doubleClickToClose">
+              <option value="true">关闭标签页</option>
+              <option value="false">不做任何操作</option>
+            </select>
+          </div>
+          
+          <!-- API Key 设置 -->
+          <div class="setting-item">
+            <label>Gemini API Key</label>
+            <input type="password" id="apiKey" placeholder="输入 API Key">
+            <div class="setting-description">仅用于 AI 分组功能</div>
+          </div>
         </div>
         <div class="settings-footer">
           <button id="cancelSettings">取消</button>
@@ -102,7 +145,7 @@
       <div class="share-toolbar">
         <button class="share-action-button" id="copySelected">复制链接</button>
         <button class="share-action-button" id="cancelShare">取消</button>
-        <span class="selected-count" id="selectedCount">选择 0 项</span>
+        <span class="selected-count" id="selectedCount">选择 0 个</span>
       </div>
     </div>
   </div>

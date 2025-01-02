@@ -21,10 +21,13 @@
   "permissions": [
     "tabs",
     "storage",
+    "tabGroups",
     "clipboardWrite",
-    "sidePanel"
+    "sidePanel",
+    "sessions"
   ],
   "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
     "<all_urls>"
   ],
   "side_panel": {

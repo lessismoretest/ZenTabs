@@ -9,7 +9,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       chrome.runtime.sendMessage({
         type: 'TAB_UPDATED',
         tabId: tabId,
-        tab: tab
+        tab: tab,
+        keepFilter: true  // 添加标记，表示需要保持筛选状态
       }).catch(() => {
         // 忽略错误，popup 可能未打开
         console.log('后台：popup 未打开，无法发送消息');
@@ -29,7 +30,8 @@ chrome.tabs.onCreated.addListener(async (tab) => {
     // 向所有打开的 popup 发送消息
     chrome.runtime.sendMessage({
       type: 'TAB_CREATED',
-      tab: tab
+      tab: tab,
+      keepFilter: true  // 添加标记，表示需要保持筛选状态
     }).catch(() => {
       // 忽略错误，popup 可能未打开
       console.log('后台：popup 未打开，无法发送消息');

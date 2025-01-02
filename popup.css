@@ -59,11 +59,12 @@ body {
 
 .tab-item {
   position: relative;
-  padding: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .tab-item:hover {
@@ -73,6 +74,29 @@ body {
 .tab-favicon {
   width: 16px;
   height: 16px;
+  transition: opacity 0.2s;
+  margin-right: 4px;
+}
+
+.copy-link-button {
+  width: 16px;
+  height: 16px;
+  display: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.copy-link-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-item:hover .tab-favicon {
+  display: none;
+}
+
+.tab-item:hover .copy-link-button {
+  display: flex;
 }
 
 .tab-title {
@@ -226,7 +250,7 @@ body {
 
 .settings-dialog {
   background: #fff;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 400px;
   max-width: 90%;
@@ -240,6 +264,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 0;  /* 移除圆角 */
 }
 
 .settings-header h2 {
@@ -439,14 +464,14 @@ body {
 
 /* 添加置顶按钮样式 */
 .pin-button {
-  width: 16px;
-  height: 16px;
-  padding: 2px;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
   border-radius: 0;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
-  margin-left: auto;
+  margin-left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -461,8 +486,8 @@ body {
 }
 
 .pin-button svg {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   fill: #666;
 }
 
@@ -637,22 +662,20 @@ body {
 
 /* 图标按钮样式 */
 .icon-button {
-  width: 24px;
-  height: 24px;
-  padding: 0;
+  background: none;
   border: none;
-  border-radius: 0;
-  background: #000;
-  color: #fff;
+  padding: 4px;
   cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s;
 }
 
 .icon-button:hover {
   transform: scale(1.05);
+  color: #000;
 }
 
 .icon-button svg {
@@ -660,49 +683,95 @@ body {
   height: 20px;
 }
 
-/* 搜索栏样式 */
+/* 搜索栏容器 */
 .search-bar {
-  padding: 0 16px 16px;
-  border-bottom: 1px solid #eee;
-  min-width: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #eee;
 }
 
+/* 搜索输入框包装器 */
 .search-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 0;
-  border-radius: 0;
+  width: 100%;
 }
 
-.search-icon {
-  position: absolute;
-  left: 12px;
-  width: 16px;
-  height: 16px;
-  color: #666;
-}
-
+/* 搜索输入框 */
 .search-input {
   width: 100%;
-  min-width: 0;
-  padding: 8px 12px 8px 36px;
-  border: 1px solid #ddd;
-  border-radius: 0;
-  font-size: 14px;
+  padding: 6px 8px 6px 32px;
+  border: 1px solid #ddd !important;
+  font-size: 13px;
+  color: #666;
+  background: #fff !important;
   outline: none;
-  transition: border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .search-input:focus {
-  border-color: #000;
+  border-color: #888 !important;
 }
 
-.search-input::placeholder {
-  color: #999;
+/* 搜索图标 */
+.search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #666 !important;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 排序选择器包装器 */
+.sort-wrapper {
+  width: 120px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* 排序选择器 */
+.sort-select {
+  width: 100%;
+  padding: 6px 24px 6px 8px;
+  border: 1px solid #ddd !important;
+  font-size: 13px;
+  color: #666;
+  background: #fff !important;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  text-align-last: center;
+  padding-left: 24px;
+}
+
+/* 深色模式样式 */
+.dark-mode .search-bar {
+  border-bottom-color: #333;
+}
+
+.dark-mode .search-input {
+  background: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0;
+}
+
+.dark-mode .search-icon {
+  color: #999 !important;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #888;
 }
 
 /* 搜索结果高亮样式 */
@@ -902,7 +971,7 @@ body {
 /* 标签页操作按钮容器 */
 .tab-actions {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   margin-left: auto;
   align-items: center;
   position: relative;
@@ -910,8 +979,8 @@ body {
 
 /* 关闭按钮样式 */
 .close-button {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   padding: 2px;
   cursor: pointer;
   opacity: 0;
@@ -921,34 +990,94 @@ body {
   justify-content: center;
 }
 
+.close-button svg {
+  width: 20px;
+  height: 20px;
+  color: #666;
+  stroke-width: 2.5;
+}
+
 .tab-item:hover .close-button {
   opacity: 1;
 }
 
 .close-button:hover {
-  background: #f0f0f0;
+  background: #e0e0e0;
 }
 
 .close-button svg {
-  width: 12px;
-  height: 12px;
+  width: 20px;
+  height: 20px;
   color: #666;
+  stroke-width: 2.5;
+}
+
+.close-button:hover svg {
+  color: #000;
+  stroke-width: 3;
+}
+
+.dark-mode .close-button svg {
+  color: #999;
+}
+
+.dark-mode .close-button:hover {
+  background: #404040;
+}
+
+.dark-mode .close-button:hover svg {
+  color: #fff;
+  stroke-width: 3;
 }
 
 /* 调整置顶按钮样式 */
 .pin-button {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border-radius: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
   margin-left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 标签页悬停时显示所有操作按钮 */
-.tab-item:hover .pin-button,
-.tab-item:hover .close-button {
-  opacity: 1;
+.pin-button svg {
+  width: 16px;
+  height: 16px;
+  fill: #666;
+  transition: fill 0.2s;
 }
 
-/* 已顶标签页的按钮始终显示 */
-.tab-item.pinned .pin-button {
-  opacity: 1;
+.pin-button:hover {
+  background: #e0e0e0;
+}
+
+.pin-button:hover svg {
+  fill: #000;
+}
+
+.dark-mode .pin-button svg {
+  fill: #999;
+}
+
+.dark-mode .pin-button:hover {
+  background: #404040;
+}
+
+.dark-mode .pin-button:hover svg {
+  fill: #fff;
+}
+
+.tab-item.pinned .pin-button svg {
+  fill: #000;
+}
+
+.dark-mode .tab-item.pinned .pin-button svg {
+  fill: #fff;
 }
 
 /* 分组关闭按钮样式 */
@@ -986,7 +1115,7 @@ body {
   padding-left: 2px;
 }
 
-/* 当标签页同时是置顶和当前动状态时样��� */
+/* 当标签页同时是置顶和当前动状态时样式 */
 .tab-item.pinned.active {
   background: #e8e8e8;
   border-left: 2px solid #000;
@@ -1055,17 +1184,28 @@ body {
 }
 
 .clear-button {
-  font-size: 13px;
+  font-size: 12px;
   color: #666;
   background: none;
   border: none;
-  padding: 4px 8px;
+  padding: 2px 6px;
   cursor: pointer;
   white-space: nowrap;
+  margin-left: 8px;
+  display: block !important;
 }
 
 .clear-button:hover {
   color: #000;
+}
+
+/* 深色模式样式 */
+.dark-mode .clear-button {
+  color: #999;
+}
+
+.dark-mode .clear-button:hover {
+  color: #fff;
 }
 
 /* 深色模式基础样式 */
@@ -1163,9 +1303,9 @@ body.dark-mode {
 
 /* 深色模式排序选择器样式 */
 .dark-mode .sort-select {
-  background: #2a2a2a;
+  background-color: #2a2a2a;
+  border-color: #444;
   color: #e0e0e0;
-  border-color: #333;
 }
 
 .dark-mode .sort-select:focus {
@@ -1484,7 +1624,7 @@ body.dark-mode {
   border-bottom: none;
 }
 
-/* 调整搜索框间距 */
+/* 调整搜索框距 */
 .dark-mode .search-input-wrapper {
   background: #2a2a2a;
   border: 1px solid #333;
@@ -1666,7 +1806,7 @@ body.dark-mode {
 }
 
 .dark-mode .search-input:focus {
-  border-color: #fff;
+  border-color: #888 !important;
   outline: none;
   border-radius: 0 !important;
 }
@@ -1676,7 +1816,7 @@ body.dark-mode {
 }
 
 .dark-mode .search-icon {
-  stroke: #fff;
+  stroke: #888;
 }
 
 /* 标签按钮基础样式 */
@@ -1926,7 +2066,7 @@ body.dark-mode {
   justify-content: space-between;
 }
 
-/* 颜色筛选器 */
+/* 颜色筛选 */
 .color-filter {
   display: flex;
   gap: 4px;
@@ -1943,6 +2083,7 @@ body.dark-mode {
   cursor: pointer;
   white-space: nowrap;
   margin-left: 8px;
+  display: block !important;
 }
 
 .clear-button:hover {
@@ -1950,10 +2091,6 @@ body.dark-mode {
 }
 
 /* 深色模式样式 */
-.dark-mode .color-filter-container {
-  border-bottom-color: #333;
-}
-
 .dark-mode .clear-button {
   color: #999;
 }
@@ -1961,3 +2098,1041 @@ body.dark-mode {
 .dark-mode .clear-button:hover {
   color: #fff;
 }
+
+/* 搜索栏容器 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+/* 搜索输入框包装器 */
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  border: none !important;
+  background: none !important;
+}
+
+/* 搜索输入框 */
+.search-input {
+  width: 100%;
+  padding: 6px 8px 6px 32px;
+  border: 1px solid #ddd !important;
+  font-size: 13px;
+  color: #666;
+  background: #fff !important;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.search-input:focus {
+  border-color: #888 !important;
+}
+
+/* 搜索图标 */
+.search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #666 !important;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 排序选择器 */
+.sort-select {
+  width: 100%;
+  padding: 6px 24px 6px 8px;
+  border: 1px solid #ddd !important;
+  font-size: 13px;
+  color: #666;
+  background: #fff !important;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  text-align-last: center;
+  padding-left: 24px;
+}
+
+/* 深色模式样式 */
+.dark-mode .search-bar {
+  border-bottom-color: #333;
+}
+
+.dark-mode .search-input {
+  background: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0;
+}
+
+.dark-mode .search-icon {
+  color: #999 !important;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #888;
+}
+
+/* 移除深色模式下的重复样式 */
+.dark-mode .search-input-wrapper {
+  border: none !important;
+  background: none !important;
+}
+
+.dark-mode .search-input {
+  background: #2d2d2d !important;
+  border: 1px solid #444 !important;
+  color: #e0e0e0;
+}
+
+.dark-mode .search-input:focus {
+  border-color: #666 !important;
+  outline: none;
+}
+
+.dark-mode .search-icon {
+  color: #999 !important;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #888;
+}
+
+/* 深色模式排序选择器样式 */
+.dark-mode .sort-select {
+  background-color: #2a2a2a !important;
+  border-color: #444 !important;
+  color: #e0e0e0;
+}
+
+/* 音频按钮样式 */
+#audioButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+}
+
+#audioButton:hover {
+  background: #f5f5f5;
+}
+
+#audioButton svg {
+  width: 18px;
+  height: 18px;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+
+#audioButton.active {
+  background: #000;
+  color: #fff;
+}
+
+#audioButton.active svg {
+  stroke: #fff;
+}
+
+/* 深色模式样式 */
+.dark-mode #audioButton {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #audioButton:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #audioButton svg {
+  stroke: #fff;
+}
+
+.dark-mode #audioButton.active {
+  background: #fff;
+  color: #000;
+}
+
+.dark-mode #audioButton.active svg {
+  stroke: #000;
+}
+
+/* 标签页图标和复制按钮样式 */
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+  transition: opacity 0.2s;
+}
+
+.copy-link-button {
+  width: 16px;
+  height: 16px;
+  display: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.copy-link-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-item:hover .tab-favicon {
+  display: none;
+}
+
+.tab-item:hover .copy-link-button {
+  display: flex;
+}
+
+/* 深色模式样式 */
+.dark-mode .copy-link-button {
+  color: #999;
+}
+
+/* 图标包装器样式 */
+.icon-wrapper {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* 标签页图标和复制按钮样式 */
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+  transition: opacity 0.2s;
+}
+
+.copy-link-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  display: none;
+  cursor: pointer;
+  color: #666;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.copy-link-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-item:hover .tab-favicon {
+  display: none;
+}
+
+.tab-item:hover .copy-link-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 深色模式样式 */
+.dark-mode .copy-link-button {
+  color: #999;
+}
+
+/* API Key 输入框样式 */
+.setting-item input[type="password"] {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  font-size: 13px;
+  color: #666;
+  background: #fff;
+  outline: none;
+}
+
+.setting-description {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* 深色模式样式 */
+.dark-mode .setting-item input[type="password"] {
+  background: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-mode .setting-description {
+  color: #666;
+}
+
+.tab-item {
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.tab-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  transform: scale(1.02);
+  z-index: 1000;
+}
+
+.tab-item:not(.dragging) {
+  transform: translateY(0);
+}
+
+/* 拖拽时的占位效果 */
+.tab-item.drag-over {
+  border-bottom: 2px solid var(--highlight-color);
+}
+
+/* 复选框样式 */
+.tab-item .checkbox {
+  display: none;
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-item .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.share-mode .tab-item .checkbox {
+  display: flex !important;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.share-mode .tab-item .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.share-mode .tab-item.selected .checkbox {
+  background-color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+
+.share-mode .tab-item.selected .checkbox::after {
+  opacity: 1;
+}
+
+/* 分享模式下调整标签页内容的位置 */
+.share-mode .tab-item {
+  padding-left: 32px;
+}
+
+/* 复选框基本样式 */
+.tab-item .checkbox {
+  display: none;
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* 分享模式下显示复选框 */
+.share-mode .tab-item .checkbox {
+  display: flex !important;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.share-mode .tab-item .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.share-mode .tab-item.selected .checkbox {
+  background-color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+
+.share-mode .tab-item.selected .checkbox::after {
+  opacity: 1;
+}
+
+.select-all-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all-wrapper .checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.select-all-wrapper .checkbox-wrapper .checkbox {
+  display: block !important;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  background-color: transparent;
+}
+
+.select-all-wrapper .checkbox-wrapper .checkbox.selected {
+  background-color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+
+.select-all-wrapper .checkbox-wrapper .checkbox.selected::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+.select-all-label {
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+/* 分享模式下的标签页复选框样式 */
+.share-mode .tab-item .checkbox {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.share-mode .tab-item.selected .checkbox {
+  background-color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+
+.share-mode .tab-item.selected .checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+.select-all-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all-wrapper .checkbox {
+  display: flex !important;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-color);
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.select-all-wrapper .checkbox.selected {
+  background-color: var(--highlight-color);
+  border-color: var(--highlight-color);
+}
+
+.select-all-wrapper .checkbox.selected::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 1;
+}
+
+.select-all-label {
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.tabs-header {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* 分组标题样式 */
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.group-header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.chevron-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.group-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* 分组收起状态 */
+.tab-group.collapsed .group-header {
+  margin-bottom: 0;
+}
+
+.tab-group.collapsed .chevron-icon {
+  transform: rotate(-90deg);
+}
+
+/* 分组展开/收起动画 */
+.tab-list {
+  transition: height 0.2s ease-out;
+}
+
+/* 分组关闭按钮 */
+.group-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.group-header:hover .group-close-button {
+  opacity: 0.6;
+}
+
+.group-close-button:hover {
+  opacity: 1 !important;
+}
+
+.group-close-button svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+
+.tab-count {
+  display: inline-block;
+  min-width: 10px;
+  text-align: center;
+}
+
+/* 归档按钮容器 */
+.archive-button-container {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 100;
+}
+
+/* 归档按钮样式 */
+.archive-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.archive-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.archive-button svg {
+  width: 20px;
+  height: 20px;
+  stroke: #000;
+  stroke-width: 2.5;
+}
+
+.dark-mode .archive-button svg {
+  stroke: #fff;
+}
+
+/* 归档列表样式 */
+.archive-list-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.archive-list-container {
+  background: #fff;
+  width: 600px;
+  max-width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.archive-list-header {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archive-list-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.close-archive-list {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  color: #666;
+}
+
+.close-archive-list:hover {
+  color: #000;
+}
+
+.archive-list-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.archive-list-footer {
+  padding: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.archive-list-footer button {
+  padding: 8px 16px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.archive-list-footer button:hover {
+  background: #f5f5f5;
+}
+
+/* 深色模式样式 */
+.dark-mode .archive-button {
+  background: #fff;
+  color: #000;
+}
+
+.dark-mode .archive-list-container {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.dark-mode .archive-list-header {
+  border-bottom-color: #333;
+}
+
+.dark-mode .close-archive-list {
+  color: #999;
+}
+
+.dark-mode .close-archive-list:hover {
+  color: #fff;
+}
+
+.dark-mode .archive-list-footer {
+  border-top-color: #333;
+}
+
+.dark-mode .archive-list-footer button {
+  background: #2a2a2a;
+  color: #fff;
+  border-color: #444;
+}
+
+.dark-mode .archive-list-footer button:hover {
+  background: #333;
+}
+
+/* 归档列表中的标签页样式 */
+.archived-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.archived-tab:hover {
+  background: #f5f5f5;
+}
+
+.archived-tab .tab-favicon {
+  width: 16px;
+  height: 16px;
+}
+
+.archived-tab .tab-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archived-tab .restore-button {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.archived-tab .restore-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.archived-tab .restore-button:hover {
+  color: #000;
+}
+
+.dark-mode .archived-tab .restore-button {
+  color: #888;
+}
+
+.dark-mode .archived-tab .restore-button:hover {
+  color: #fff;
+}
+
+#archiveButton,
+#archiveListButton,
+#shareButton,
+#settingsButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+}
+
+#archiveButton:hover,
+#archiveListButton:hover,
+#shareButton:hover,
+#settingsButton:hover {
+  background: #f5f5f5;
+}
+
+#archiveButton svg,
+#archiveListButton svg,
+#shareButton svg,
+#settingsButton svg {
+  width: 18px;
+  height: 18px;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+
+/* 深色模式 */
+.dark-mode #archiveButton,
+.dark-mode #archiveListButton,
+.dark-mode #shareButton,
+.dark-mode #settingsButton {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #archiveButton:hover,
+.dark-mode #archiveListButton:hover,
+.dark-mode #shareButton:hover,
+.dark-mode #settingsButton:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #archiveButton svg,
+.dark-mode #archiveListButton svg,
+.dark-mode #shareButton svg,
+.dark-mode #settingsButton svg {
+  stroke: #fff;
+}
+
+/* 归档分组样式 */
+.archived-group {
+  margin-bottom: 24px;
+}
+
+.archived-group .group-header {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.archived-group .tab-item {
+  opacity: 0.8;
+}
+
+.archived-group .tab-item:hover {
+  opacity: 1;
+}
+
+/* 深色模式 */
+.dark-mode .archived-group .group-header {
+  background: #2a2a2a;
+  color: #999;
+}
+
+#archiveListButton.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+#archiveListButton.active svg {
+  stroke: #fff;
+}
+
+/* 深色模式 */
+.dark-mode #archiveListButton.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.dark-mode #archiveListButton.active svg {
+  stroke: #000;
+}
+
+/* 恢复按钮样式 */
+#restoreButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+}
+
+#restoreButton:hover {
+  background: #f5f5f5;
+}
+
+#restoreButton svg {
+  width: 18px;
+  height: 18px;
+  fill: #000;
+}
+
+/* 深色模式 */
+.dark-mode #restoreButton {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #restoreButton:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #restoreButton svg {
+  fill: #fff;
+}
+
+/* 复制链接按钮样式 */
+.copy-url-button {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.copy-url-button:hover {
+  color: #000;
+}
+
+.copy-url-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 调整搜索框内边距，为按钮留出空间 */
+.search-input {
+  padding-right: 32px !important;
+}
+
+/* 深色模式样式 */
+.dark-mode .copy-url-button {
+  color: #999;
+}
+
+.dark-mode .copy-url-button:hover {
+  color: #fff;
+}
+
