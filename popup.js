@@ -1241,6 +1241,12 @@ function initializeEventListeners() {
         currentView = 'ai';
       }
 
+      // 如果是AI视图，并且有缓存结果，直接使用缓存
+      if (currentView === 'ai' && lastAiGroupResult) {
+        renderGroups(lastAiGroupResult);
+        return;
+      }
+
       // 重新渲染当前视图
       await switchView(currentView);
     } catch (error) {
@@ -1259,6 +1265,12 @@ function initializeEventListeners() {
       let currentView = 'default';
       if (aiButton && aiButton.classList.contains('active')) {
         currentView = 'ai';
+      }
+
+      // 如果是AI视图，并且有缓存结果，直接使用缓存
+      if (currentView === 'ai' && lastAiGroupResult) {
+        renderGroups(lastAiGroupResult);
+        return;
       }
 
       // 重新渲染当前视图
@@ -1293,8 +1305,17 @@ function initializeEventListeners() {
       // 删除已关闭标签页的颜色标记
       delete tabTags[tabId];
       await chrome.storage.local.set({ tabTags });
+
+      // 如果是AI视图，更新缓存
+      if (currentView === 'ai') {
+        updateAiGroupCache(tabId);
+        if (lastAiGroupResult) {
+          renderGroups(lastAiGroupResult);
+          return;
+        }
+      }
       
-      // 使用 switchView 函数来保持当前视图状态
+      // 重新渲染当前视图
       await switchView(currentView);
       
       // 恢复所有标签颜色
@@ -2557,8 +2578,9 @@ async function switchView(mode) {
     }
     
     // 获取存储的标签颜色
-    const result = await chrome.storage.local.get(['tabTags']);
+    const result = await chrome.storage.local.get(['tabTags', 'settings']);
     const tabTags = result.tabTags || {};
+    const settings = result.settings || getDefaultSettings();
     
     // 更新按钮样式
     const defaultButton = document.getElementById('defaultView');
@@ -2582,17 +2604,38 @@ async function switchView(mode) {
           defaultButton.classList.add('active');
         }
         renderDefaultView(tabs);
+        
+        // 保存当前视图模式到设置
+        settings.defaultView = 'default';
+        await chrome.storage.local.set({ settings });
       } else if (mode === 'ai' && tabs.length > 0) {
         if (aiButton) {
           aiButton.classList.add('active');
         }
-        await aiGroupTabs(tabs);
+        
+        // 如果有缓存的AI分组结果且未过期，直接使用缓存
+        const currentTime = Date.now();
+        if (lastAiGroupResult && 
+            lastAiGroupTime && 
+            (currentTime - lastAiGroupTime < AI_CACHE_TIMEOUT)) {
+          renderGroups(lastAiGroupResult);
+        } else {
+          await aiGroupTabs(tabs);
+        }
+        
+        // 保存当前视图模式到设置
+        settings.defaultView = 'ai';
+        await chrome.storage.local.set({ settings });
       } else {
         // 如果没有标签页或模式无效，切换到默认视图
         if (defaultButton) {
           defaultButton.classList.add('active');
         }
         renderDefaultView(tabs);
+        
+        // 保存当前视图模式到设置
+        settings.defaultView = 'default';
+        await chrome.storage.local.set({ settings });
       }
       
       // 恢复所有标签颜色
@@ -2612,6 +2655,10 @@ async function switchView(mode) {
         defaultButton.classList.add('active');
       }
       renderDefaultView(tabs);
+      
+      // 保存当前视图模式到设置
+      settings.defaultView = 'default';
+      await chrome.storage.local.set({ settings });
     }
   } catch (error) {
     console.error('切换视图失败:', error);
