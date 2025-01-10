@@ -65,22 +65,37 @@ let lastAiGroupTime = 0;
 const AUTO_REGROUP_THRESHOLD = 5; // 触发自动重新分组的新标签页数量阈值
 let newTabsCount = 0; // 新增标签页计数器
 
+// 在文件顶部导入
+import { MODEL_CONFIGS, callAIModel, extractJsonFromResponse } from './models.js';
+
+// 全局变量声明
+let isShareMode = false;
+let selectedTabs = new Set();
+
+// 在文件顶部添加变量声明
+let searchTimeout = null;
+let searchInputElem = null;  // 用于存储搜索输入框元素
+
 /**
  * 初始化应用
  */
 async function initialize() {
   console.log('popup：开始初始化');
   try {
+    console.log('正在加载设置...');
     // 加载设置
     const data = await chrome.storage.local.get('settings');
     settings = { ...getDefaultSettings(), ...data.settings };
     
+    console.log('正在应用主题...');
     // 应用主题
     applyThemeMode(settings.themeMode);
     
+    console.log('正在渲染设置...');
     // 渲染设置
     renderSettings(settings);
     
+    console.log('正在获取当前标签页...');
     // 获取当前标签页URL并设置到搜索框
     const [activeTab] = await chrome.tabs.query({
       active: true,
@@ -88,15 +103,19 @@ async function initialize() {
     });
     
     if (activeTab && activeTab.url) {
-      const searchInput = document.getElementById('searchInput');
-      searchInput.value = activeTab.url;
-      console.log('当前标签页URL:', activeTab.url);
+      searchInputElem = document.getElementById('searchInput');
+      if (searchInputElem) {
+        searchInputElem.value = activeTab.url;
+        console.log('当前标签页URL:', activeTab.url);
+      }
     }
     
+    console.log('正在获取所有标签页...');
     // 获取并显示当前标签页
     const tabs = await getCurrentTabs();
     console.log('popup：初始化时获取到标签页数量:', tabs.length);
     
+    console.log('正在切换视图...');
     // 根据默认视图设置渲染
     if (settings.defaultView === 'ai') {
       await switchView('ai');
@@ -202,158 +221,81 @@ async function loadTabs() {
   
   tabList.innerHTML = '';
   tabs.forEach(tab => {
-    const tabElement = createTabElement(tab);
+    const tabElement = createTabElement(tab, false);  // 添加 false 参数表示非归档标签页
     tabList.appendChild(tabElement);
   });
 }
 
 /**
  * 创建标签页元素
- * @param {chrome.tabs.Tab} tab
+ * @param {Tab} tab - 标签页数据
+ * @param {boolean} [isArchived=false] - 是否为归档的标签页
+ * @returns {HTMLElement} 标签页元素
  */
-function createTabElement(tab) {
-  const li = document.createElement('li');
-  li.className = 'tab-item';
-  li.dataset.tabId = tab.id?.toString();
+function createTabElement(tab, isArchived = false) {
+  const tabItem = document.createElement('div');
+  tabItem.className = 'tab-item';
+  tabItem.setAttribute('data-tab-id', tab.id);
   
-  // 从存储中获取标签颜色
-  chrome.storage.local.get(['tabTags'], (result) => {
-    const tabTags = result.tabTags || {};
-    if (tabTags[tab.id]) {
-      li.dataset.tagColor = tabTags[tab.id];
-    }
-  });
+  // 添加复选框（仅在分享模式下显示）
+  const checkbox = document.createElement('div');
+  checkbox.className = 'tab-checkbox';
+  tabItem.appendChild(checkbox);
   
-  li.innerHTML = `
-    <div class="icon-wrapper">
-      <img class="tab-favicon" src="${tab.favIconUrl || 'default-favicon.png'}" alt="">
-      <button class="copy-link-button" title="复制链接">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-        </svg>
-      </button>
-    </div>
-    <span class="tab-title">${tab.title}</span>
-    <div class="tab-actions">
-      <button class="tag-button" title="设置标签"></button>
-      ${tagDropdownHtml}
-      <button class="close-button" title="关闭标签页">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 6l12 12M6 18L18 6"/>
-        </svg>
-      </button>
-    </div>
-  `;
+  // 添加图标
+  const favicon = document.createElement('img');
+  favicon.className = 'tab-favicon';
+  favicon.src = tab.favIconUrl || 'icons/default-favicon.png';
+  favicon.onerror = () => {
+    favicon.src = 'icons/default-favicon.png';
+  };
+  tabItem.appendChild(favicon);
   
-  // 添加复制按钮点击事件
-  const copyButton = li.querySelector('.copy-link-button');
-  copyButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigator.clipboard.writeText(tab.url).then(() => {
-      copyButton.title = '已复制';
-      setTimeout(() => {
-        copyButton.title = '复制链接';
-      }, 1000);
-    });
-  });
+  // 添加标题
+  const title = document.createElement('span');
+  title.className = 'tab-title';
+  title.textContent = tab.title;
+  tabItem.appendChild(title);
   
-  // 添加双击标题关闭标签页功能
-  const titleElement = li.querySelector('.tab-title');
-  titleElement.addEventListener('dblclick', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    try {
-      // 获取设置并检查是否启用双击关闭
-      const { settings } = await chrome.storage.local.get('settings');
-      if (settings?.doubleClickToClose) {
-        // 先关闭标签页
-        await chrome.tabs.remove(tab.id);
-        
-        // 更新AI分组缓存
-        updateAiGroupCache(tab.id);
-        
-        // 更新 UI
-        li.remove();
-        
-        // 更新总标签数
-        updateTabCount();
-      }
-    } catch (error) {
-      console.error('关闭标签页失败:', error);
-    }
-  });
-  
-  // 标签按钮点击事件
-  const tagButton = li.querySelector('.tag-button');
-  const tagDropdown = li.querySelector('.tag-dropdown');
-  
-  tagButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // 关闭其他所有下拉菜单
-    document.querySelectorAll('.tag-dropdown.show').forEach(dropdown => {
-      if (dropdown !== tagDropdown) {
-        dropdown.classList.remove('show');
-      }
-    });
-    
-    // 切换当前下拉菜单
-    const isVisible = tagDropdown.classList.contains('show');
-    if (!isVisible) {
-      // 确保在显示之前其他所有下拉菜单都已关闭
-      document.querySelectorAll('.tag-dropdown.show').forEach(dropdown => {
-        dropdown.classList.remove('show');
-      });
-    }
-    tagDropdown.classList.toggle('show');
-  });
-  
-  // 颜色选择事件
-  const tagColors = li.querySelectorAll('.tag-color');
-  tagColors.forEach(color => {
-    color.addEventListener('click', (e) => {
-      e.preventDefault();
+  // 添加关闭按钮
+  if (!isArchived) {
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close-button';
+    closeButton.innerHTML = '×';
+    closeButton.title = '关闭标签页';
+    closeButton.onclick = async (e) => {
       e.stopPropagation();
-      const selectedColor = color.dataset.color;
-      
-      // 保存标签颜色到存储
-      chrome.storage.local.get(['tabTags'], (result) => {
-        const tabTags = result.tabTags || {};
-        tabTags[tab.id] = selectedColor;
-        chrome.storage.local.set({ tabTags }, () => {
-          // 确保颜色保存后立即应用
-          const tabItem = e.target.closest('.tab-item');
-          if (tabItem) {
-            tabItem.dataset.tagColor = selectedColor;
-          }
-          
-          // 立即更新颜色筛选器
-          createColorFilter(tabTags);
-        });
-      });
-      
-      // 关闭颜色选择器
-      tagDropdown.classList.remove('show');
-    });
-  });
+      await closeTab(tab.id);
+    };
+    tabItem.appendChild(closeButton);
+  }
   
-  // 点击标签页
-  li.addEventListener('click', (e) => {
-    if (e.target.closest('.close-button')) {
-      // 关闭标签页
-      chrome.tabs.remove(tab.id);
-      li.remove();
-    } else {
-      // 切换到标签页
-      chrome.tabs.update(tab.id, { active: true });
-      chrome.windows.update(tab.windowId, { focused: true });
+  // 添加点击事件
+  tabItem.addEventListener('click', async () => {
+    if (!handleTabClick(tabItem, tab)) {
+      if (isArchived) {
+        await restoreArchivedTab(tab);
+      } else {
+        await chrome.tabs.update(tab.id, { active: true });
+        window.close();
+      }
     }
   });
   
-  return li;
+  // 添加双击事件
+  if (!isArchived && settings.doubleClickToClose) {
+    tabItem.addEventListener('dblclick', async (e) => {
+      e.stopPropagation();
+      await closeTab(tab.id);
+    });
+  }
+  
+  // 添加拖拽功能
+  if (!isArchived) {
+    initDragAndDrop(tabItem);
+  }
+  
+  return tabItem;
 }
 
 
@@ -361,33 +303,16 @@ function createTabElement(tab) {
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('popup：DOM加载完成');
   try {
-    // 加载设置
-    const data = await chrome.storage.local.get('settings');
-    settings = { ...getDefaultSettings(), ...data.settings };
-    console.log('popup：加载设置:', settings);
+    // 先初始化
+    await initialize();
     
-    // 应用主题
-    applyThemeMode(settings.themeMode);
+    // 从storage加载closedTabs
+    const result = await chrome.storage.local.get(['closedTabs']);
+    closedTabs = result.closedTabs || [];
     
-    // 渲染设置
-    renderSettings(settings);
-    
-    // 获取并显示当前标签页
-    const tabs = await getCurrentTabs();
-    console.log('popup：初始化时获取到标签页数量:', tabs.length);
-    
-    // 根据默认视图设置渲染
-    if (settings.defaultView === 'ai') {
-      await switchView('ai');
-    } else {
-      await switchView('default');
-    }
-    
-    // 初始化事件监听器
-    initializeEventListeners();
-    
-    // 设置自动刷新
-    setupAutoRefresh();
+    // 恢复按钮点击事件
+    document.getElementById('restoreButton').addEventListener('click', restoreClosedTab);
+    document.getElementById('shareButton').addEventListener('click', toggleShareMode);
   } catch (error) {
     console.error('popup：初始化失败:', error);
   }
@@ -939,255 +864,6 @@ function renderGroups(groups) {
 }
 
 /**
- * 从响应文本中提取JSON字符串
- * @param {string} text - 响应文本
- * @returns {string} JSON字符串
- */
-function extractJsonFromResponse(text) {
-  // 尝试直接解析
-  try {
-    JSON.parse(text);
-    return text;
-  } catch (e) {
-    // 如果直接解析失败，尝试取JSON部分
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return jsonMatch[0];
-    }
-    throw new Error('无法从响应中提取效的JSON');
-  }
-}
-
-/**
- * 调用 Gemini API 进行智能分组
- * @param {Tab[]} tabs - 标签页数组
- */
-async function aiGroupTabs(tabs) {
-  try {
-    // 显示加载状态
-    const button = document.getElementById('aiGroupTabs');
-    if (button) {
-      button.classList.add('loading');
-      button.innerHTML = `
-        <span class="loading-spinner"></span>
-        <span>AI分组中...</span>
-      `;
-    }
-
-    // 检查缓存
-    const currentTime = Date.now();
-    if (lastAiGroupResult && 
-        lastAiGroupTime && 
-        (currentTime - lastAiGroupTime < AI_CACHE_TIMEOUT)) {
-      console.log('使用缓存的AI分组结果');
-      renderGroups(lastAiGroupResult);
-      if (button) {
-        button.classList.remove('loading');
-        button.innerHTML = 'AI智能分组';
-      }
-      return lastAiGroupResult;
-    }
-
-    // 从设置中获取 API Key
-    const { settings } = await chrome.storage.local.get('settings');
-    const API_KEY = settings.apiKey || 'AIzaSyCVF1DEc9hQbam42-eMObONqISF-fm3kH4';
-    
-    if (!settings.apiKey) {
-      alert('请在设置中填写 API Key');
-      throw new Error('未设置 API Key');
-    }
-
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
-
-    // 准备标签页数据
-    const tabsData = tabs.map((tab, index) => {
-      try {
-        // 提取更多有用的信息
-        const url = new URL(tab.url || 'chrome://newtab/');
-        const pathSegments = url.pathname.split('/').filter(Boolean);
-        return {
-          index,
-          title: tab.title || 'New Tab',
-          url: tab.url || 'chrome://newtab/',
-          domain: url.hostname,
-          pathname: pathSegments.join('/'),
-          isSpecial: url.protocol === 'chrome:' || url.protocol === 'chrome-extension:'
-        };
-      } catch (error) {
-        return {
-          index,
-          title: tab.title || 'New Tab',
-          url: 'chrome://newtab/',
-          domain: 'newtab',
-          isSpecial: true
-        };
-      }
-    });
-
-    const prompt = `作为标签页管理助手，请将标签页智能分组。
-
-要求：
-1. 分组规则：
-   - 优先按内容主题分组（如"购物"、"社交"、"开发"等）
-   - 同一网站的不同页面应该根据内容分到不同组
-   - 特殊页面（chrome://等）归为"系统"组
-   - 新标签页归为"未分类"组
-   
-2. 分组限制：
-   - 每组3-6个标签页
-   - 组名2-4个汉字
-   - 组名要简洁精确
-   - 相似主题合并到同一组
-   
-3. 命名规范：
-   - 使用场景类名称，如"前端开发"而不是"编程"
-   - 避免使用网站名作为组名
-   - 使用动宾结构，如"看视频"而不是"视频"
-   - 特殊页面统一用"系统"
-
-标签页数据：
-${JSON.stringify(tabsData, null, 2)}
-
-请返回如下格式的JSON：
-{
-  "组名称": [
-    {
-      "index": 标签页索引
-    }
-  ]
-}`;
-
-    console.log('发送AI请求...');
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-        }
-      })
-    });
-
-    // 处理429错误
-    if (response.status === 429) {
-      throw new Error('请求过于频繁，请稍后再试');
-    }
-
-    if (!response.ok) {
-      throw new Error(`请求失败: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('AI响应:', data);
-
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      throw new Error('API返回数据格式错误');
-    }
-
-    const aiResponse = data.candidates[0].content.parts[0].text;
-    console.log('AI返回文本:', aiResponse);
-
-    // 解析并处理JSON响应
-    const jsonStr = extractJsonFromResponse(aiResponse);
-    const groupingResult = JSON.parse(jsonStr);
-    console.log('解析后的分组结果:', groupingResult);
-
-    // 创建与 AI 分组结果相匹配的分组数据结构
-    const aiGroups = {};
-    for (const [groupName, items] of Object.entries(groupingResult)) {
-      // 过滤掉无效的标签页
-      const validItems = items.filter(item => {
-        const tab = tabs[item.index];
-        return tab && tab.id && tab.title !== undefined;
-      });
-      
-      if (validItems.length > 0) {
-        aiGroups[groupName] = validItems.map(item => {
-          const tab = tabs[item.index];
-          return {
-            tab,
-            newTitle: tab.title || 'New Tab'
-          };
-        });
-      }
-    }
-
-    // 如果没有有效的分组，抛出错误
-    if (Object.keys(aiGroups).length === 0) {
-      throw new Error('无法创建有效的分组，请重试');
-    }
-
-    // 缓存结果
-    lastAiGroupResult = aiGroups;
-    lastAiGroupTime = currentTime;
-
-    // 使用 Chrome 标签组 API 创建实际的标签组
-    for (const [groupName, items] of Object.entries(aiGroups)) {
-      if (groupName === '未分类') continue; // 跳过未分类组
-      
-      try {
-        // 创建新的标签组
-        const group = await chrome.tabs.group({
-          tabIds: items.map(item => item.tab.id)
-        });
-        
-        // 设置标签组的颜色和标题
-        const color = Object.keys(GROUP_COLORS)[Math.floor(Math.random() * Object.keys(GROUP_COLORS).length)];
-        await chrome.tabGroups.update(group, {
-          title: groupName,
-          color: color
-        });
-      } catch (error) {
-        console.error(`创建标签组 "${groupName}" 失败:`, error);
-      }
-    }
-
-    // 使用 AI 分组结果渲染视图
-    renderGroups(aiGroups);
-
-    // 移除加载状态
-    if (button) {
-      button.classList.remove('loading');
-      button.innerHTML = 'AI智能分组';
-    }
-
-    return groupingResult;
-  } catch (error) {
-    console.error('AI分组失败:', error);
-    
-    // 移除加载状态
-    const button = document.getElementById('aiGroupTabs');
-    if (button) {
-      button.classList.remove('loading');
-      button.innerHTML = 'AI智能分组';
-      
-      // 如果是429错误，显示更友好的提示
-      if (error.message.includes('429') || error.message.includes('请求过于频繁')) {
-        const retryAfter = 30; // 建议等待时间（秒）
-        alert(`请求过于频繁，建议${retryAfter}秒后再试`);
-        switchView('default');
-        return;
-      }
-    }
-
-    // 显示友好的错误提示
-    alert(`AI分组失败: ${error.message}\n请稍后重试或切换到默认视图`);
-    
-    // 切换回默认视图
-    switchView('default');
-  }
-}
-
-/**
  * 获取随机颜色
  * @returns {string} Chrome标签组颜色
  */
@@ -1461,40 +1137,52 @@ function initializeEventListeners() {
   });
   
   console.log('事件监听器初始化完成');
-}
 
-// 添加分享相关的状和函数
-let isShareMode = false;
-let selectedTabs = new Set();
+  // 添加搜索事件监听
+  searchInputElem = document.getElementById('searchInput');
+  if (searchInputElem) {
+    searchInputElem.addEventListener('input', handleSearch);
+    console.log('搜索事件监听器已绑定');
+  } else {
+    console.error('未找到搜索输入框');
+  }
+}
 
 /**
  * 切换分享模式
- * @param {boolean} enabled - 是否启用分享模式
  */
-function toggleShareMode(enabled) {
-  isShareMode = enabled;
+function toggleShareMode() {
+  const shareOverlay = document.getElementById('shareOverlay');
   const container = document.getElementById('tabGroups');
-  const overlay = document.getElementById('shareOverlay');
-  const shareButton = document.getElementById('shareButton');
   
-  if (enabled) {
-    container.classList.add('share-mode');
-    overlay.style.display = 'block';
-    shareButton.style.display = 'none';
+  if (shareOverlay) {
+    const isVisible = shareOverlay.style.display === 'flex';
+    shareOverlay.style.display = isVisible ? 'none' : 'flex';
+    isShareMode = !isVisible;
+    
+    if (container) {
+      if (isShareMode) {
+        container.classList.add('share-mode');
+      } else {
+        container.classList.remove('share-mode');
+      }
+    }
+    
+    // 重置选中状态
     selectedTabs.clear();
-    updateSelectedCount();
-  } else {
-    container.classList.remove('share-mode');
-    overlay.style.display = 'none';
-    shareButton.style.display = 'flex';
-    selectedTabs.clear();
+    document.getElementById('selectedCount').textContent = '已选择 0 项';
+    
+    // 重新渲染以更新复选框状态
+    getCurrentTabs().then(tabs => {
+      const isGroupView = container.querySelector('.tab-group') !== null;
+      if (isGroupView) {
+        const groups = groupTabs(tabs);
+        renderGroups(groups);
+      } else {
+        renderDefaultView(tabs);
+      }
+    });
   }
-  
-  // 重新渲染更新UI状态
-  getCurrentTabs().then(tabs => {
-    const groups = groupTabs(tabs);
-    renderGroups(groups);
-  });
 }
 
 /**
@@ -1605,6 +1293,7 @@ async function saveSettings() {
   try {
     settings.themeMode = document.getElementById('themeMode').value;
     settings.defaultView = document.getElementById('defaultView').value;
+    settings.modelType = document.getElementById('modelType').value;
     settings.apiKey = document.getElementById('apiKey').value;
     settings.doubleClickToClose = document.getElementById('doubleClickToClose').value === 'true';
     
@@ -1696,88 +1385,25 @@ function applySettings() {
  * @param {string} query - 搜索关键词
  */
 function searchTabs(query) {
-  console.log('执行搜索，关键词:', query);
+  const normalizedQuery = query.toLowerCase().trim();
+  const tabItems = document.querySelectorAll('.tab-item');
   
-  try {
-    const searchTerm = query.toLowerCase();
-    const container = document.getElementById('tabGroups');
-    
-    if (!container) {
-      console.error('未找到标签页容器');
-      return;
-    }
-    
-    const isGroupView = container.querySelector('.tab-group') !== null;
-    console.log('当前视图模式:', isGroupView ? '分组视图' : '默认视图');
-
-    if (isGroupView) {
-      // 分组视图的搜索
-      const groups = container.querySelectorAll('.tab-group');
-      console.log('找到分组数量:', groups.length);
-      
-      groups.forEach(group => {
-        let hasVisibleTabs = false;
-        const tabs = group.querySelectorAll('.tab-item');
-        console.log(`处理分组 ${group.id}，包含标签页数量:`, tabs.length);
-        
-        tabs.forEach(tab => {
-          const titleElement = tab.querySelector('.tab-title');
-          if (!titleElement) {
-            console.error('标签页缺少标题元素:', tab);
-            return;
-          }
-          
-          const title = titleElement.textContent.toLowerCase();
-          
-          if (searchTerm === '') {
-            tab.style.display = '';
-            titleElement.innerHTML = titleElement.textContent;
-            hasVisibleTabs = true;
-          } else if (title.includes(searchTerm)) {
-            tab.style.display = '';
-            titleElement.innerHTML = highlightText(titleElement.textContent, searchTerm);
-            hasVisibleTabs = true;
-          } else {
-            tab.style.display = 'none';
-          }
-        });
-
-        group.style.display = hasVisibleTabs ? '' : 'none';
-      });
-    } else {
-      // 默认视图的搜索
-      const tabs = container.querySelectorAll('.tab-item');
-      console.log('找到标签页数量:', tabs.length);
-      
-      tabs.forEach(tab => {
-        const titleElement = tab.querySelector('.tab-title');
-        if (!titleElement) {
-          console.error('标签页缺少标题元素:', tab);
-          return;
-        }
-        
-        const title = titleElement.textContent.toLowerCase();
-        
-        if (searchTerm === '') {
-          tab.style.display = '';
-          titleElement.innerHTML = titleElement.textContent;
-        } else if (title.includes(searchTerm)) {
-          tab.style.display = '';
-          titleElement.innerHTML = highlightText(titleElement.textContent, searchTerm);
-        } else {
-          tab.style.display = 'none';
-        }
-      });
-    }
-    
-    // 更新计数
-    updateTabCount();
-  } catch (error) {
-    console.error('搜索过程中发生错误:', error);
-  }
+  tabItems.forEach(item => {
+    const title = item.querySelector('.tab-title').textContent.toLowerCase();
+    const isMatch = title.includes(normalizedQuery);
+    item.style.display = isMatch ? '' : 'none';
+  });
+  
+  // 在分组视图中，隐藏空组
+  document.querySelectorAll('.tab-group').forEach(group => {
+    const hasVisibleTabs = Array.from(group.querySelectorAll('.tab-item'))
+      .some(item => item.style.display !== 'none');
+    group.style.display = hasVisibleTabs ? '' : 'none';
+  });
+  
+  // 更新计数
+  updateTabCount();
 }
-
-let searchTimeout = null;
 
 /**
  * 处理搜索
@@ -1785,13 +1411,12 @@ let searchTimeout = null;
  */
 function handleSearch(event) {
   try {
-    const searchInput = event.target;
-    console.log('搜索输入事件触发，值:', searchInput.value);
+    console.log('搜索输入事件触发，值:', event.target.value);
     
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-      console.log('执行延迟搜索，值:', searchInput.value);
-      searchTabs(searchInput.value);
+      console.log('执行延迟搜索，值:', event.target.value);
+      searchTabs(event.target.value);
     }, 300);
   } catch (error) {
     console.error('处理搜索输入时发生错误:', error);
@@ -1814,17 +1439,18 @@ document.addEventListener('keydown', (e) => {
   // Ctrl/Cmd + F 聚焦搜索框
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
     e.preventDefault();
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.focus();
+    searchInputElem = document.getElementById('searchInput');
+    if (searchInputElem) {
+      searchInputElem.focus();
     }
   }
   
-  // ESC 空索
-  if (e.key === 'Escape' && document.activeElement === searchInput) {
-    searchInput.value = '';
+  // ESC 清空搜索
+  const activeElement = document.activeElement;
+  if (e.key === 'Escape' && activeElement === searchInputElem) {
+    activeElement.value = '';
     searchTabs('');
-    searchInput.blur();
+    activeElement.blur();
   }
 });
 
@@ -2480,7 +2106,8 @@ chrome.runtime.onMessage.addListener(async (message) => {
 function getDefaultSettings() {
   return {
     themeMode: 'auto',
-    defaultView: 'default',  // 只保留 'default' 和 'ai' 两个选项
+    defaultView: 'default',
+    modelType: 'gemini',
     apiKey: '',
     doubleClickToClose: true
   };
@@ -2494,6 +2121,7 @@ function renderSettings(settings) {
   console.log('popup：渲染设置:', settings);
   const themeModeSelect = document.getElementById('themeMode');
   const defaultViewSelect = document.getElementById('defaultView');
+  const modelTypeSelect = document.getElementById('modelType');
   const apiKeyInput = document.getElementById('apiKey');
   const doubleClickToCloseSelect = document.getElementById('doubleClickToClose');
   
@@ -2505,10 +2133,14 @@ function renderSettings(settings) {
     defaultViewSelect.value = settings.defaultView;
   }
   
+  if (modelTypeSelect) {
+    modelTypeSelect.value = settings.modelType;
+  }
+  
   if (apiKeyInput) {
     apiKeyInput.value = settings.apiKey || '';
   }
-
+  
   if (doubleClickToCloseSelect) {
     doubleClickToCloseSelect.value = settings.doubleClickToClose ? 'true' : 'false';
   }
@@ -2666,44 +2298,6 @@ async function switchView(mode) {
 }
 
 /**
- * 切换分享模式
- */
-function toggleShareMode() {
-  const shareOverlay = document.getElementById('shareOverlay');
-  const container = document.getElementById('tabGroups');
-  
-  if (shareOverlay) {
-    const isVisible = shareOverlay.style.display === 'flex';
-    shareOverlay.style.display = isVisible ? 'none' : 'flex';
-    isShareMode = !isVisible;
-    
-    // 切换分享模式类
-    if (container) {
-      if (isShareMode) {
-        container.classList.add('share-mode');
-      } else {
-        container.classList.remove('share-mode');
-      }
-    }
-    
-    // 重置选中状态
-    selectedTabs.clear();
-    document.getElementById('selectedCount').textContent = '已选择 0 项';
-    
-    // 重新渲染以更新复选框状态
-    getCurrentTabs().then(tabs => {
-      const isGroupView = container.querySelector('.tab-group') !== null;
-      if (isGroupView) {
-        const groups = groupTabs(tabs);
-        renderGroups(groups);
-      } else {
-        renderDefaultView(tabs);
-      }
-    });
-  }
-}
-
-/**
  * 切换设置面板
  */
 function toggleSettings() {
@@ -2720,21 +2314,6 @@ function toggleSettings() {
     }
   }
 }
-
-/**
- * 处理搜索
- * @param {Event} event - 输入事件
- */
-function handleSearch(event) {
-  const searchInput = event.target;
-  console.log('搜索输入:', searchInput.value);
-  
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    searchTabs(searchInput.value);
-  }, 300);
-}
-
 /**
  * 处理排序
  * @param {Event} event - 变更事件
@@ -3485,95 +3064,6 @@ function createGroupElement(groupName, tabs, isArchived = false) {
   return groupDiv;
 }
 
-// 修改创建标签页元素的函数
-function createTabElement(tab, isArchived = false) {
-  const tabDiv = document.createElement('div');
-  tabDiv.className = 'tab-item';
-  tabDiv.setAttribute('data-tab-id', tab.id);
-  
-  // 处理 favicon
-  let faviconHtml = '';
-  if (tab.url === 'chrome://newtab/' || !tab.favIconUrl) {
-    faviconHtml = `
-      <svg class="tab-favicon" viewBox="0 0 1024 1024">
-        <path d="M258.016 447.008L112 192.992Q183.008 102.976 288 51.488T512 0q138.016 0 255.488 68t185.504 183.008H534.976q-11.008-0.992-23.008-0.992-90.016 0-160.992 55.488t-92.992 141.504z m436.992-122.016h294.016q35.008 90.016 35.008 187.008 0 103.008-40 197.504t-107.488 163.008-161.504 109.504-196.992 42.016l208.992-363.008q47.008-67.008 47.008-148.992 0-110.016-79.008-187.008zM326.016 512q0-76.992 54.496-131.488T512 326.016t131.488 54.496T697.984 512t-54.496 131.488T512 697.984t-131.488-54.496T326.016 512z m256 252.992l-146.016 252.992q-122.016-18.016-222.016-88.992t-156.992-180.992T0 512q0-135.008 66.016-251.008l208.992 362.016q32 68 96 109.504T512 774.016q36 0 70.016-8.992z" fill="#5f6368"/>
-      </svg>`;
-  } else {
-    faviconHtml = `<img class="tab-favicon" src="${tab.favIconUrl}" alt="" onerror="this.style.display='none'">`;
-  }
-  
-  tabDiv.innerHTML = `
-    <div class="icon-wrapper">
-      ${faviconHtml}
-    </div>
-    <span class="tab-title" title="${tab.title}">${tab.title}</span>
-    ${isArchived ? `
-      <button class="restore-button" title="恢复标签页">
-        <svg viewBox="0 0 24 24" width="16" height="16">
-          <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" fill="currentColor"/>
-        </svg>
-      </button>
-    ` : ''}
-  `;
-  
-  if (!isArchived) {
-    tabDiv.addEventListener('click', () => {
-      chrome.tabs.update(tab.id, { active: true });
-    });
-  } else {
-    const restoreButton = tabDiv.querySelector('.restore-button');
-    if (restoreButton) {
-      restoreButton.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        try {
-          // 设置标志，表示正在从归档视图中恢复标签页
-          isRestoringFromArchive = true;
-          isShowingArchived = true;
-          
-          // 创建新标签页
-          await chrome.tabs.create({ url: tab.url });
-          
-          // 获取最新的归档数据
-          const { archivedGroups = [] } = await chrome.storage.local.get('archivedGroups');
-          
-          // 从归档数据中移除已恢复的标签页
-          const updatedGroups = archivedGroups.map(group => ({
-            ...group,
-            tabs: group.tabs.filter(t => t.url !== tab.url)
-          })).filter(group => group.tabs.length > 0); // 移除空组
-          
-          // 保存更新后的归档数据
-          await chrome.storage.local.set({ archivedGroups: updatedGroups });
-          
-          // 确保归档按钮保持激活状态
-          const archiveListButton = document.getElementById('archiveListButton');
-          if (archiveListButton) {
-            archiveListButton.classList.add('active');
-          }
-          
-          // 移除其他视图的激活状态
-          document.getElementById('defaultView')?.classList.remove('active');
-          document.getElementById('groupTabs')?.classList.remove('active');
-          document.getElementById('aiGroupTabs')?.classList.remove('active');
-          
-          // 立即渲染归档视图
-          renderArchivedView(updatedGroups);
-          
-          // 延迟重置标志
-          setTimeout(() => {
-            isRestoringFromArchive = false;
-          }, 5000); // 增加延迟时间到5秒
-        } catch (error) {
-          console.error('恢复标签页失败:', error);
-          // 确保在出错时也重置标志
-          isRestoringFromArchive = false;
-        }
-      });
-    }
-  }
-  
-  return tabDiv;
-}
 
 let isShowingArchived = false;
 
@@ -3812,5 +3302,158 @@ function updateAiGroupCache(closedTabId) {
         lastAiGroupTime = 0;
       }
     }
+  }
+}
+
+/**
+ * 调用 AI 模型进行智能分组
+ * @param {Tab[]} tabs - 标签页数组
+ */
+async function aiGroupTabs(tabs) {
+  try {
+    // 显示加载状态
+    const button = document.getElementById('aiGroupTabs');
+    if (button) {
+      button.classList.add('loading');
+      button.innerHTML = `
+        <span class="loading-spinner"></span>
+        <span>AI分组中...</span>
+      `;
+    }
+
+    // 检查缓存
+    const currentTime = Date.now();
+    if (lastAiGroupResult && 
+        lastAiGroupTime && 
+        (currentTime - lastAiGroupTime < AI_CACHE_TIMEOUT)) {
+      console.log('使用缓存的AI分组结果');
+      renderGroups(lastAiGroupResult);
+      if (button) {
+        button.classList.remove('loading');
+        button.innerHTML = 'AI智能分组';
+      }
+      return lastAiGroupResult;
+    }
+
+    // 从设置中获取模型类型和 API Key
+    const { settings } = await chrome.storage.local.get('settings');
+    const modelType = settings.modelType || 'gemini';
+    const apiKey = settings.apiKey;
+    
+    if (!apiKey) {
+      alert('请在设置中填写 API Key');
+      throw new Error('未设置 API Key');
+    }
+
+    // 准备标签页数据
+    const tabsData = tabs.map((tab, index) => {
+      try {
+        const url = new URL(tab.url || 'chrome://newtab/');
+        const pathSegments = url.pathname.split('/').filter(Boolean);
+        return {
+          index,
+          title: tab.title || 'New Tab',
+          url: tab.url || 'chrome://newtab/',
+          domain: url.hostname,
+          pathname: pathSegments.join('/'),
+          isSpecial: url.protocol === 'chrome:' || url.protocol === 'chrome-extension:'
+        };
+      } catch (error) {
+        return {
+          index,
+          title: tab.title || 'New Tab',
+          url: 'chrome://newtab/',
+          domain: 'newtab',
+          isSpecial: true
+        };
+      }
+    });
+
+    // 调用 AI 模型
+    const groupingResult = await callAIModel(modelType, apiKey, tabsData);
+
+    // 创建与 AI 分组结果相匹配的分组数据结构
+    const aiGroups = {};
+    for (const [groupName, items] of Object.entries(groupingResult)) {
+      // 过滤掉无效的标签页
+      const validItems = items.filter(item => {
+        const tab = tabs[item.index];
+        return tab && tab.id && tab.title !== undefined;
+      });
+      
+      if (validItems.length > 0) {
+        aiGroups[groupName] = validItems.map(item => {
+          const tab = tabs[item.index];
+          return {
+            tab,
+            newTitle: tab.title || 'New Tab'
+          };
+        });
+      }
+    }
+
+    // 如果没有有效的分组，抛出错误
+    if (Object.keys(aiGroups).length === 0) {
+      throw new Error('无法创建有效的分组，请重试');
+    }
+
+    // 缓存结果
+    lastAiGroupResult = aiGroups;
+    lastAiGroupTime = currentTime;
+
+    // 使用 Chrome 标签组 API 创建实际的标签组
+    for (const [groupName, items] of Object.entries(aiGroups)) {
+      if (groupName === '未分类') continue; // 跳过未分类组
+      
+      try {
+        // 创建新的标签组
+        const group = await chrome.tabs.group({
+          tabIds: items.map(item => item.tab.id)
+        });
+        
+        // 设置标签组的颜色和标题
+        const color = Object.keys(GROUP_COLORS)[Math.floor(Math.random() * Object.keys(GROUP_COLORS).length)];
+        await chrome.tabGroups.update(group, {
+          title: groupName,
+          color: color
+        });
+      } catch (error) {
+        console.error(`创建标签组 "${groupName}" 失败:`, error);
+      }
+    }
+
+    // 使用 AI 分组结果渲染视图
+    renderGroups(aiGroups);
+
+    // 移除加载状态
+    if (button) {
+      button.classList.remove('loading');
+      button.innerHTML = 'AI智能分组';
+    }
+
+    return groupingResult;
+  } catch (error) {
+    console.error('AI分组失败:', error);
+    
+    // 移除加载状态
+    const button = document.getElementById('aiGroupTabs');
+    if (button) {
+      button.classList.remove('loading');
+      button.innerHTML = 'AI智能分组';
+      
+      // 如果是429错误，显示更友好的提示
+      if (error.message.includes('429') || error.message.includes('请求过于频繁')) {
+        const retryAfter = 30; // 建议等待时间（秒）
+        alert(`请求过于频繁，建议${retryAfter}秒后再试`);
+        switchView('default');
+        return;
+      }
+    }
+
+    // 显示友好的错误提示
+    alert(`AI分组失败: ${error.message}\n请稍后重试或切换到默认视图`);
+    
+    // 切换回默认视图
+    switchView('default');
   }
 }

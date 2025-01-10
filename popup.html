@@ -129,9 +129,18 @@
           
           <!-- API Key 设置 -->
           <div class="setting-item">
-            <label>Gemini API Key</label>
+            <label>API Key</label>
             <input type="password" id="apiKey" placeholder="输入 API Key">
-            <div class="setting-description">仅用于 AI 分组功能</div>
+            <div class="setting-description">用于 AI 分组功能</div>
+          </div>
+          
+          <!-- 模型选择 -->
+          <div class="setting-item">
+            <label>AI 模型</label>
+            <select id="modelType">
+              <option value="gemini">Gemini</option>
+              <option value="deepseek">Deepseek</option>
+            </select>
           </div>
         </div>
         <div class="settings-footer">
@@ -149,6 +158,6 @@
       </div>
     </div>
   </div>
-  <script src="popup.js"></script>
+  <script src="popup.js" type="module"></script>
 </body>
 </html> 
