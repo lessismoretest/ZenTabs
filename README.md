@@ -21,7 +21,7 @@ MinimalTabs 是一个简洁优雅的 Chrome 标签页管理器，专注于提供
 
 - 🎯 **智能分组** 
   - 按域名自动分组
-  - AI 智能分组（基于标签页内容相似度）
+  - AI 智能分组（基于标签页内容相似度，gemini和deepseek模型均支持）
   - 自定义分组规则
   
 - 📌 **标签管理**
@@ -88,6 +88,7 @@ MinimalTabs 是一个简洁优雅的 Chrome 标签页管理器，专注于提供
 - 存储：Chrome Storage API
 - 构建工具：Webpack
 - 代码规范：ESLint
+- 模型：gemini和deepseek模型均支持
 
 ## 📋 开发计划
 
