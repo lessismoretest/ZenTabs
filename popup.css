@@ -32,22 +32,7 @@ body {
 }
 
 .tab-group {
-  margin-bottom: 24px;
-}
-
-.group-header {
-  background: #000;
-  color: #fff;
-  padding: 8px 12px;
-  margin-bottom: 8px;
-  scroll-margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.group-divider {
-  display: none;
+  margin-bottom: 12px;
 }
 
 .tab-list {
@@ -2662,18 +2647,6 @@ body.dark-mode {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* 分组标题样式 */
-.group-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--bg-secondary);
-  border-radius: 6px;
-  margin-bottom: 4px;
-  cursor: pointer;
-  user-select: none;
-}
 
 .group-header-content {
   display: flex;
