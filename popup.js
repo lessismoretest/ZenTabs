@@ -1301,47 +1301,49 @@ async function applyExtensionPosition() {
  */
 async function saveSettings() {
   try {
-    settings.themeMode = document.getElementById('themeMode').value;
-    settings.defaultView = document.getElementById('defaultView').value;
-    settings.modelType = document.getElementById('modelType').value;
-    settings.apiKey = document.getElementById('apiKey').value;
-    settings.doubleClickToClose = document.getElementById('doubleClickToClose').value === 'true';
+    // 获取设置值
+    const newSettings = {
+      themeMode: document.getElementById('themeMode')?.value || 'auto',
+      defaultView: document.getElementById('defaultView')?.value || 'default',
+      modelType: document.getElementById('modelType')?.value || 'gemini',
+      apiKey: document.getElementById('apiKey')?.value?.trim() || '',
+      doubleClickToClose: document.getElementById('doubleClickToClose')?.value === 'true'
+    };
 
-    console.log('设置已保存:', settings);
-    
-    // 应用设置
-    applyThemeMode(settings.themeMode);
-    
-    // 根据默认视图设置重新渲染
-    const tabs = await getCurrentTabs();
-    if (settings.defaultView === 'domain') {
-      const groups = groupTabs(tabs);
-      renderGroups(groups);
-      // 更新按钮状态
-      document.getElementById('groupTabs').classList.add('active');
-      document.getElementById('defaultView').classList.remove('active');
-      document.getElementById('aiGroupTabs').classList.remove('active');
-    } else if (settings.defaultView === 'ai') {
-      await aiGroupTabs(tabs);
-      // 更新按钮状态
-      document.getElementById('aiGroupTabs').classList.add('active');
-      document.getElementById('defaultView').classList.remove('active');
-      document.getElementById('groupTabs').classList.remove('active');
-    } else {
-      renderDefaultView(tabs);
-      // 更新按钮状态
-      document.getElementById('defaultView').classList.add('active');
-      document.getElementById('groupTabs').classList.remove('active');
-      document.getElementById('aiGroupTabs').classList.remove('active');
+    // 验证 API key 不为空
+    if (!newSettings.apiKey) {
+      console.error('API key 不能为空');
+      alert('请输入有效的 API key');
+      return;
     }
+
+    // 更新设置对象
+    settings = { ...settings, ...newSettings };
+    
+    console.log('正在保存设置...', { ...settings, apiKey: '***' });
     
     // 保存设置到存储
     await chrome.storage.local.set({ settings });
     
+    // 验证设置是否保存成功
+    const savedSettings = await chrome.storage.local.get('settings');
+    if (!savedSettings.settings?.apiKey) {
+      throw new Error('设置保存验证失败');
+    }
+    
+    console.log('设置保存成功');
+    
+    // 应用设置
+    applyThemeMode(settings.themeMode);
+    
     // 关闭设置面板
     toggleSettings();
+    
+    // 显示成功提示
+    alert('设置保存成功！');
   } catch (error) {
     console.error('保存设置失败:', error);
+    alert('保存设置失败: ' + error.message);
   }
 }
 
@@ -1349,21 +1351,39 @@ async function saveSettings() {
  * 修改加载设置函数
  */
 async function loadSettings() {
-  const result = await chrome.storage.local.get('settings');
-  if (result.settings) {
-    settings = result.settings;
-    // 更新选择框的值
-    document.getElementById('letterIndexEnabled').value = settings.letterIndexEnabled.toString();
-    document.getElementById('letterIndexPosition').value = settings.letterIndexPosition;
-    document.getElementById('faviconIndexPosition').value = settings.faviconIndexPosition;
-    document.getElementById('extensionPosition').value = settings.extensionPosition;
+  try {
+    console.log('正在加载设置...');
+    const result = await chrome.storage.local.get('settings');
     
-    // 根据字母索引开关状态显示/隐藏位置设置
-    document.getElementById('letterIndexPositionSetting').style.display = 
-      settings.letterIndexEnabled ? 'block' : 'none';
+    if (result.settings) {
+      settings = { ...getDefaultSettings(), ...result.settings };
+      console.log('设置加载成功', { ...settings, apiKey: settings.apiKey ? '***' : undefined });
+      
+      // 更新设置界面
+      document.getElementById('themeMode').value = settings.themeMode;
+      document.getElementById('defaultView').value = settings.defaultView;
+      document.getElementById('modelType').value = settings.modelType;
+      document.getElementById('apiKey').value = settings.apiKey || '';
+      document.getElementById('doubleClickToClose').value = settings.doubleClickToClose.toString();
+      document.getElementById('letterIndexEnabled').value = settings.letterIndexEnabled.toString();
+      document.getElementById('letterIndexPosition').value = settings.letterIndexPosition;
+      document.getElementById('faviconIndexPosition').value = settings.faviconIndexPosition;
+      document.getElementById('extensionPosition').value = settings.extensionPosition;
+      
+      // 根据字母索引开关状态显示/隐藏位置设置
+      document.getElementById('letterIndexPositionSetting').style.display = 
+        settings.letterIndexEnabled ? 'block' : 'none';
+    } else {
+      console.log('没有找到已保存的设置，使用默认设置');
+      settings = getDefaultSettings();
+    }
+    
+    applySettings();
+    applyExtensionPosition();
+  } catch (error) {
+    console.error('加载设置失败:', error);
+    alert('加载设置失败: ' + error.message);
   }
-  applySettings();
-  applyExtensionPosition();
 }
 
 /**
