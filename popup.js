@@ -102,13 +102,7 @@ async function initialize() {
       lastFocusedWindow: true
     });
     
-    if (activeTab && activeTab.url) {
-      searchInputElem = document.getElementById('searchInput');
-      if (searchInputElem) {
-        searchInputElem.value = activeTab.url;
-        console.log('当前标签页URL:', activeTab.url);
-      }
-    }
+    searchInputElem = document.getElementById('searchInput');
     
     console.log('正在获取所有标签页...');
     // 获取并显示当前标签页
@@ -889,10 +883,7 @@ function initializeEventListeners() {
   chrome.tabs.onActivated.addListener(async (activeInfo) => {
     try {
       const tab = await chrome.tabs.get(activeInfo.tabId);
-      if (tab && tab.url) {
-        const searchInput = document.getElementById('searchInput');
-        searchInput.value = tab.url;
-      }
+      // 移除更新搜索框URL的代码
     } catch (error) {
       console.error('获取活动标签页失败:', error);
     }
@@ -901,12 +892,8 @@ function initializeEventListeners() {
   // 监听标签页更新事件
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     try {
-      // 更新搜索框URL
-      if (changeInfo.url && tab.active) {
-        const searchInput = document.getElementById('searchInput');
-        searchInput.value = changeInfo.url;
-      }
-
+      // 移除更新搜索框URL的代码
+      
       // 获取当前视图模式
       const defaultButton = document.getElementById('defaultView');
       const aiButton = document.getElementById('aiGroupTabs');
@@ -1389,9 +1376,17 @@ function searchTabs(query) {
   const tabItems = document.querySelectorAll('.tab-item');
   
   tabItems.forEach(item => {
-    const title = item.querySelector('.tab-title').textContent.toLowerCase();
+    const titleElement = item.querySelector('.tab-title');
+    const title = titleElement.textContent.toLowerCase();
     const isMatch = title.includes(normalizedQuery);
     item.style.display = isMatch ? '' : 'none';
+    
+    // 添加高亮
+    if (isMatch && normalizedQuery) {
+      titleElement.innerHTML = highlightText(titleElement.textContent, normalizedQuery);
+    } else {
+      titleElement.innerHTML = titleElement.textContent;
+    }
   });
   
   // 在分组视图中，隐藏空组
