@@ -3051,7 +3051,7 @@ body.dark-mode {
 /* 分组标题样式 */
 .group-header {
   position: relative;
-  padding: 8px;
+  padding: 0px;
   cursor: pointer;
   user-select: none;
 }
@@ -3059,14 +3059,46 @@ body.dark-mode {
 .group-header-content {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   position: relative;
-  padding: 4px 8px;
+  padding: 8px 8px;
   background-color: #f1f3f4;
-  border-radius: 4px;
+  border-radius: 0px;
+  text-align: center;
 }
 
-/* 分组关闭按钮样式 */
+.group-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 标签数量样式 */
+.tab-count {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.tab-count::before {
+  content: '(';
+}
+
+.tab-count::after {
+  content: ')';
+}
+
+/* 深色模式样式 */
+.dark-mode .group-header-content {
+  background-color: #2d2d2d;
+}
+
+.dark-mode .tab-count {
+  color: #999;
+}
+
 .close-group-button {
   position: absolute;
   right: 8px;
@@ -3100,19 +3132,5 @@ body.dark-mode {
 .close-group-button:hover {
   color: #000;
   background: rgba(0, 0, 0, 0.1);
-}
-
-/* 深色模式样式 */
-.dark-mode .group-header-content {
-  background-color: #2d2d2d;
-}
-
-.dark-mode .close-group-button {
-  color: #999;
-}
-
-.dark-mode .close-group-button:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
 }
 
