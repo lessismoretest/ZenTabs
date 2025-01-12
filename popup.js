@@ -231,38 +231,26 @@ function createTabElement(tab, isArchived = false) {
   tabItem.className = 'tab-item';
   tabItem.setAttribute('data-tab-id', tab.id);
   
-  // 添加复选框（仅在分享模式下显示）
-  const checkbox = document.createElement('div');
-  checkbox.className = 'tab-checkbox';
-  tabItem.appendChild(checkbox);
-  
-  // 添加图标
-  const favicon = document.createElement('img');
-  favicon.className = 'tab-favicon';
-  favicon.src = tab.favIconUrl || 'icons/default-favicon.png';
-  favicon.onerror = () => {
-    favicon.src = 'icons/default-favicon.png';
-  };
-  tabItem.appendChild(favicon);
-  
-  // 添加标题
-  const title = document.createElement('span');
-  title.className = 'tab-title';
-  title.textContent = tab.title;
-  tabItem.appendChild(title);
-  
-  // 添加关闭按钮
-  if (!isArchived) {
-    const closeButton = document.createElement('button');
-    closeButton.className = 'close-button';
-    closeButton.innerHTML = '×';
-    closeButton.title = '关闭标签页';
-    closeButton.onclick = async (e) => {
-      e.stopPropagation();
-      await closeTab(tab.id);
-    };
-    tabItem.appendChild(closeButton);
-  }
+  // 修改 HTML 结构，移除复制链接按钮
+  tabItem.innerHTML = `
+    <div class="checkbox"></div>
+    <img class="tab-favicon" src="${tab.favIconUrl || 'icons/default-favicon.png'}" onerror="this.src='icons/default-favicon.png'">
+    <span class="tab-title" title="${tab.title}">${tab.title}</span>
+    <div class="tab-actions">
+      <button class="tag-button" title="设置标签"></button>
+      ${tagDropdownHtml}
+      <button class="pin-button" title="置顶标签页">
+        <svg viewBox="0 0 24 24">
+          <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+        </svg>
+      </button>
+      <button class="close-button" title="关闭标签页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M6 18L18 6"/>
+        </svg>
+      </button>
+    </div>
+  `;
   
   // 添加点击事件
   tabItem.addEventListener('click', async () => {

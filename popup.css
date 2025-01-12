@@ -60,7 +60,6 @@ body {
   width: 16px;
   height: 16px;
   transition: opacity 0.2s;
-  margin-right: 4px;
 }
 
 .copy-link-button {
@@ -76,13 +75,6 @@ body {
   height: 16px;
 }
 
-.tab-item:hover .tab-favicon {
-  display: none;
-}
-
-.tab-item:hover .copy-link-button {
-  display: flex;
-}
 
 .tab-title {
   flex: 1;
@@ -2089,7 +2081,7 @@ body.dark-mode {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 0px 16px;
   border-bottom: 1px solid #eee;
 }
 
@@ -2267,27 +2259,6 @@ body.dark-mode {
   transition: opacity 0.2s;
 }
 
-.copy-link-button {
-  width: 16px;
-  height: 16px;
-  display: none;
-  cursor: pointer;
-  color: #666;
-}
-
-.copy-link-button svg {
-  width: 16px;
-  height: 16px;
-}
-
-.tab-item:hover .tab-favicon {
-  display: none;
-}
-
-.tab-item:hover .copy-link-button {
-  display: flex;
-}
-
 /* 深色模式样式 */
 .dark-mode .copy-link-button {
   color: #999;
@@ -2308,33 +2279,8 @@ body.dark-mode {
   transition: opacity 0.2s;
 }
 
-.copy-link-button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 16px;
-  height: 16px;
-  display: none;
-  cursor: pointer;
-  color: #666;
-  border: none;
-  background: none;
-  padding: 0;
-}
-
-.copy-link-button svg {
-  width: 16px;
-  height: 16px;
-}
-
 .tab-item:hover .tab-favicon {
-  display: none;
-}
-
-.tab-item:hover .copy-link-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
 }
 
 /* 深色模式样式 */
@@ -3094,12 +3040,6 @@ body.dark-mode {
   width: 16px;
   height: 16px;
 }
-
-/* 调整搜索框内边距，为按钮留出空间 */
-.search-input {
-  padding-right: 32px !important;
-}
-
 /* 深色模式样式 */
 .dark-mode .copy-url-button {
   color: #999;
