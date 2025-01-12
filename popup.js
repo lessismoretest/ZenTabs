@@ -1075,7 +1075,7 @@ function initializeEventListeners() {
       alert('AI分组失败，请重试');
     } finally {
       button.classList.remove('loading');
-      button.textContent = 'AI智能分组';
+      button.textContent = 'AI 分组';
     }
   });
   
