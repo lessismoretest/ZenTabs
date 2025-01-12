@@ -1079,6 +1079,28 @@ function initializeEventListeners() {
         audioButton.classList.add('active');
         audioButton.title = `正在播放 (${audibleTabs.length})`;
         
+        // 获取容器
+        const tabsContainer = document.getElementById('tabGroups');
+        
+        // 如果没有正在播放的标签页,显示空状态提示
+        if (audibleTabs.length === 0) {
+          // 隐藏 clear 按钮和分割线
+          const colorFilterContainer = document.querySelector('.color-filter-container');
+          if (colorFilterContainer) {
+            colorFilterContainer.style.display = 'none';
+          }
+          
+          // 清空容器并显示空状态提示
+          tabsContainer.innerHTML = '<div class="empty-message">没有正在播放的标签页</div>';
+          return;
+        }
+        
+        // 如果有正在播放的标签页,显示 clear 按钮和分割线
+        const colorFilterContainer = document.querySelector('.color-filter-container');
+        if (colorFilterContainer) {
+          colorFilterContainer.style.display = '';
+        }
+        
         // 隐藏非播放中的标签页
         document.querySelectorAll('.tab-item').forEach(item => {
           const tabId = parseInt(item.getAttribute('data-tab-id'));
@@ -1105,6 +1127,19 @@ function initializeEventListeners() {
         document.querySelectorAll('.tab-group').forEach(group => {
           group.style.display = '';
         });
+        
+        // 重新渲染当前视图
+        const defaultButton = document.getElementById('defaultView');
+        const aiButton = document.getElementById('aiGroupTabs');
+        
+        // 获取当前激活的视图按钮
+        let currentView = 'default';
+        if (aiButton && aiButton.classList.contains('active')) {
+          currentView = 'ai';
+        }
+        
+        // 重新渲染
+        await switchView(currentView);
       }
     } catch (error) {
       console.error('音频筛选失败:', error);
