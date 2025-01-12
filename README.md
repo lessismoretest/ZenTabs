@@ -13,8 +13,7 @@ MinimalTabs 是一个简洁优雅的 Chrome 标签页管理器，专注于提供
   <p><em>默认列表界面</em></p>
    <img src="assets/screenshot-icon.png" alt="筛选icon界面" width="600">
   <p><em>筛选icon界面</em></p>
-  <img src="assets/screenshot-aigroup.png" alt="AI 分组截图" width="600">
-  <p><em>AI 分组界面</em></p>
+
 </div>
 
 ## ✨ 主要特性
