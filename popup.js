@@ -3467,7 +3467,7 @@ async function aiGroupTabs(tabs) {
       renderGroups(lastAiGroupResult);
       if (button) {
         button.classList.remove('loading');
-        button.innerHTML = 'AI智能分组';
+        button.innerHTML = 'AI 分组';
       }
       return lastAiGroupResult;
     }
@@ -3565,7 +3565,7 @@ async function aiGroupTabs(tabs) {
     // 移除加载状态
     if (button) {
       button.classList.remove('loading');
-      button.innerHTML = 'AI智能分组';
+      button.innerHTML = 'AI 分组';
     }
 
     return groupingResult;
@@ -3576,7 +3576,7 @@ async function aiGroupTabs(tabs) {
     const button = document.getElementById('aiGroupTabs');
     if (button) {
       button.classList.remove('loading');
-      button.innerHTML = 'AI智能分组';
+      button.innerHTML = 'AI 分组';
       
       // 如果是429错误，显示更友好的提示
       if (error.message.includes('429') || error.message.includes('请求过于频繁')) {
