@@ -630,12 +630,8 @@ function renderGroups(groups) {
     
     const header = document.createElement('div');
     header.className = 'group-header';
-    
-    // 获取该组的颜色
-    const color = groupColors[groupName];
-    
     header.innerHTML = `
-      <div class="group-header-content" style="color: ${GROUP_COLORS[color]}; background-color: #f1f3f4; border-radius: 4px; padding: 4px 8px;">
+      <div class="group-header-content">
         <span class="group-toggle">
           <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 9l6 6 6-6"/>
@@ -643,12 +639,55 @@ function renderGroups(groups) {
         </span>
         <span class="group-title">${groupName}</span>
         <span class="tab-count">${items.length}</span>
+        <button class="close-group-button" title="关闭分组内所有标签页">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 6l12 12M6 18L18 6"/>
+          </svg>
+        </button>
       </div>
     `;
     
     // 添加分组标题点击事件
     const headerContent = header.querySelector('.group-header-content');
+    const closeButton = header.querySelector('.close-group-button');
+
+    // 添加关闭按钮的点击事件
+    if (closeButton) {
+      closeButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+          // 获取分组内所有标签页的ID
+          const tabIds = items.map(item => item.tab.id);
+          
+          // 如果要关闭的是所有标签页，先创建一个新标签页
+          const allTabs = await chrome.tabs.query({ currentWindow: true });
+          if (tabIds.length === allTabs.length) {
+            await chrome.tabs.create({});
+          }
+          
+          // 关闭标签页
+          await chrome.tabs.remove(tabIds);
+          
+          // 移除分组元素
+          groupElement.remove();
+          
+          // 更新计数
+          updateTabCount();
+        } catch (error) {
+          console.error('关闭分组失败:', error);
+        }
+      });
+    }
+
+    // 添加分组标题点击事件
     headerContent.addEventListener('click', (e) => {
+      // 如果点击的是关闭按钮，不处理折叠/展开
+      if (e.target.closest('.close-group-button')) {
+        return;
+      }
+      
       e.preventDefault();
       e.stopPropagation();
       
@@ -3022,6 +3061,11 @@ function createGroupElement(groupName, tabs, isArchived = false) {
       </span>
       <span class="group-title">${groupName}</span>
       <span class="tab-count">${tabs.length}</span>
+      <button class="close-group-button" title="关闭分组内所有标签页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 6l12 12M6 18L18 6"/>
+        </svg>
+      </button>
     </div>
     ${isArchived ? `
       <button class="restore-group-button" title="恢复分组">
@@ -3043,21 +3087,27 @@ function createGroupElement(groupName, tabs, isArchived = false) {
   // 添加分组标题点击事件
   const headerContent = groupHeader.querySelector('.group-header-content');
   headerContent.addEventListener('click', (e) => {
+    // 如果点击的是关闭按钮，不处理折叠/展开
+    if (e.target.closest('.close-group-button')) {
+      return;
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     
-    const chevron = headerContent.querySelector('.chevron-icon');
+    const tabList = groupElement.querySelector('.tab-list');
+    const chevron = header.querySelector('.chevron-icon');
     
     if (tabList.style.display === 'none') {
       // 展开
       tabList.style.display = '';
       chevron.style.transform = 'rotate(0deg)';
-      groupDiv.classList.remove('collapsed');
+      groupElement.classList.remove('collapsed');
     } else {
       // 收起
       tabList.style.display = 'none';
       chevron.style.transform = 'rotate(-90deg)';
-      groupDiv.classList.add('collapsed');
+      groupElement.classList.add('collapsed');
     }
   });
 
@@ -3108,6 +3158,39 @@ function createGroupElement(groupName, tabs, isArchived = false) {
           console.error('恢复分组失败:', error);
           // 确保在出错时也重置标志
           isRestoringFromArchive = false;
+        }
+      });
+    }
+  }
+  
+  // 添加关闭分组按钮点击事件
+  if (!isArchived) {
+    const closeButton = groupHeader.querySelector('.close-group-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+          // 获取分组内所有标签页的ID
+          const tabIds = tabs.map(tab => tab.tab.id);
+          
+          // 如果要关闭的是所有标签页，先创建一个新标签页
+          const allTabs = await chrome.tabs.query({ currentWindow: true });
+          if (tabIds.length === allTabs.length) {
+            await chrome.tabs.create({});
+          }
+          
+          // 关闭标签页
+          await chrome.tabs.remove(tabIds);
+          
+          // 移除分组元素
+          groupDiv.remove();
+          
+          // 更新计数
+          updateTabCount();
+        } catch (error) {
+          console.error('关闭分组失败:', error);
         }
       });
     }

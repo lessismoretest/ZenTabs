@@ -3048,3 +3048,71 @@ body.dark-mode {
   color: #fff;
 }
 
+/* 分组标题样式 */
+.group-header {
+  position: relative;
+  padding: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.group-header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding: 4px 8px;
+  background-color: #f1f3f4;
+  border-radius: 4px;
+}
+
+/* 分组关闭按钮样式 */
+.close-group-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  color: #666;
+}
+
+.close-group-button svg {
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+.group-header:hover .close-group-button {
+  opacity: 1;
+}
+
+.close-group-button:hover {
+  color: #000;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式样式 */
+.dark-mode .group-header-content {
+  background-color: #2d2d2d;
+}
+
+.dark-mode .close-group-button {
+  color: #999;
+}
+
+.dark-mode .close-group-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
