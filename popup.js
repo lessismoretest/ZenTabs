@@ -1307,8 +1307,17 @@ async function saveSettings() {
       defaultView: document.getElementById('defaultView')?.value || 'default',
       modelType: document.getElementById('modelType')?.value || 'gemini',
       apiKey: document.getElementById('apiKey')?.value?.trim() || '',
-      doubleClickToClose: document.getElementById('doubleClickToClose')?.value === 'true'
+      doubleClickToClose: document.getElementById('doubleClickToClose')?.value === 'true',
+      letterIndexEnabled: document.getElementById('letterIndexEnabled')?.value === 'true',
+      letterIndexPosition: document.getElementById('letterIndexPosition')?.value || 'right',
+      faviconIndexPosition: document.getElementById('faviconIndexPosition')?.value || 'left',
+      extensionPosition: document.getElementById('extensionPosition')?.value || 'right'
     };
+
+    // 验证 defaultView 的值
+    if (newSettings.defaultView !== 'default' && newSettings.defaultView !== 'ai') {
+      newSettings.defaultView = 'default';
+    }
 
     // 验证 API key 不为空
     if (!newSettings.apiKey) {
@@ -1335,6 +1344,7 @@ async function saveSettings() {
     
     // 应用设置
     applyThemeMode(settings.themeMode);
+    applySettings();
     
     // 关闭设置面板
     toggleSettings();
@@ -2146,10 +2156,14 @@ chrome.runtime.onMessage.addListener(async (message) => {
 function getDefaultSettings() {
   return {
     themeMode: 'auto',
-    defaultView: 'default',
+    defaultView: 'default', // 只能是 'default' 或 'ai'
     modelType: 'gemini',
     apiKey: '',
-    doubleClickToClose: true
+    doubleClickToClose: true,
+    letterIndexEnabled: true,
+    letterIndexPosition: 'right',
+    faviconIndexPosition: 'left',
+    extensionPosition: 'right'
   };
 }
 
