@@ -1271,8 +1271,7 @@ async function saveSettings() {
     settings.modelType = document.getElementById('modelType').value;
     settings.apiKey = document.getElementById('apiKey').value;
     settings.doubleClickToClose = document.getElementById('doubleClickToClose').value === 'true';
-    
-    await chrome.storage.local.set({ settings });
+
     console.log('设置已保存:', settings);
     
     // 应用设置
@@ -1301,8 +1300,11 @@ async function saveSettings() {
       document.getElementById('aiGroupTabs').classList.remove('active');
     }
     
+    // 保存设置到存储
+    await chrome.storage.local.set({ settings });
+    
     // 关闭设置面板
-    document.getElementById('settingsOverlay').style.display = 'none';
+    toggleSettings();
   } catch (error) {
     console.error('保存设置失败:', error);
   }

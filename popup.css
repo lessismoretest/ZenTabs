@@ -665,8 +665,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  border-bottom: 1px solid #eee;
+  padding: 0px 16px;
+  border-bottom: none;
 }
 
 /* 搜索输入框包装器 */
@@ -734,7 +734,7 @@ body {
 
 /* 深色模式样式 */
 .dark-mode .search-bar {
-  border-bottom-color: #333;
+  border-bottom: none;
 }
 
 .dark-mode .search-input {
@@ -2082,7 +2082,6 @@ body.dark-mode {
   align-items: center;
   gap: 8px;
   padding: 0px 16px;
-  border-bottom: 1px solid #eee;
 }
 
 /* 搜索输入框包装器 */
