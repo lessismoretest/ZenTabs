@@ -154,7 +154,9 @@ MIT License - 查看 [LICENSE](LICENSE) 文件了解更多详情
 - 项目主页：[GitHub](https://github.com/yourusername/MinimalTabs)
 - 问题反馈：[Issue 页面](https://github.com/yourusername/MinimalTabs/issues)
 - 电子邮件：your.email@example.com
-
+- 微信：![alt text](image.png)
 ---
+
+
 
 **MinimalTabs** - 让标签管理更简单、更高效 ✨
