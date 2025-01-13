@@ -722,7 +722,9 @@ body {
   border: 1px solid #ddd !important;
   font-size: 13px;
   color: #666;
-  background: #fff !important;
+  background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>') no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 16px !important;
   cursor: pointer;
   outline: none;
   appearance: none;
@@ -730,6 +732,71 @@ body {
   text-align: center;
   text-align-last: center;
   padding-left: 24px;
+}
+
+.sort-select:focus {
+  border-color: #888 !important;
+}
+
+/* 排序选择器选项样式 */
+.sort-select option {
+  text-align: left;
+  padding: 8px;
+}
+
+/* 深色模式排序选择器样式 */
+.dark-mode .sort-select {
+  background: #2d2d2d url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>') no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 16px !important;
+  border-color: #444 !important;
+  color: #e0e0e0;
+}
+
+.dark-mode .sort-select:focus {
+  border-color: #666 !important;
+}
+
+.dark-mode .sort-select option {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+/* 排序图标样式 */
+.sort-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+/* 升序降序指示器 */
+.sort-order-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.sort-order-indicator.asc {
+  transform: rotate(180deg);
+}
+
+/* 最近打开时间排序样式 */
+.sort-by-recent .tab-item {
+  transition: order 0.3s ease;
+}
+
+.sort-by-recent.asc .tab-item {
+  order: 1;
+}
+
+.sort-by-recent.desc .tab-item {
+  order: -1;
 }
 
 /* 深色模式样式 */

@@ -1749,7 +1749,7 @@ async function loadTabAccessCount() {
 }
 
 /**
- * 根据选的方式对标签页进行排序
+ * 根据选择的方式对标签页进行排序
  * @param {Array<{tab: Tab, newTitle: string}>} tabs - 标签页数组
  * @param {string} sortMethod - 排序方式
  * @returns {Array<{tab: Tab, newTitle: string}>}
@@ -1760,6 +1760,18 @@ function sortTabs(tabs, sortMethod) {
       return [...tabs].sort((a, b) => a.tab.id - b.tab.id);
     case 'time-desc':
       return [...tabs].sort((a, b) => b.tab.id - a.tab.id);
+    case 'recent-asc':
+      return [...tabs].sort((a, b) => {
+        const aLastAccessed = a.tab.lastAccessed || 0;
+        const bLastAccessed = b.tab.lastAccessed || 0;
+        return aLastAccessed - bLastAccessed;
+      });
+    case 'recent-desc':
+      return [...tabs].sort((a, b) => {
+        const aLastAccessed = a.tab.lastAccessed || 0;
+        const bLastAccessed = b.tab.lastAccessed || 0;
+        return bLastAccessed - aLastAccessed;
+      });
     case 'freq-asc':
       return [...tabs].sort((a, b) => 
         (tabAccessCount.get(a.tab.id) || 0) - (tabAccessCount.get(b.tab.id) || 0)
@@ -3699,4 +3711,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 切换标签页按钮点击事件
   document.getElementById('switchTabButton').addEventListener('click', switchBetweenTabs);
+});
+
+// 添加排序选择器的事件监听
+document.addEventListener('DOMContentLoaded', () => {
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) {
+    // 添加最近打开时间选项
+    const recentAscOption = document.createElement('option');
+    recentAscOption.value = 'recent-asc';
+    recentAscOption.textContent = '最近打开 ↑';
+    sortSelect.appendChild(recentAscOption);
+
+    const recentDescOption = document.createElement('option');
+    recentDescOption.value = 'recent-desc';
+    recentDescOption.textContent = '最近打开 ↓';
+    sortSelect.appendChild(recentDescOption);
+
+    // 添加排序事件监听
+    sortSelect.addEventListener('change', handleSort);
+  }
 });
