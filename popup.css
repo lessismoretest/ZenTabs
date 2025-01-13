@@ -3116,3 +3116,61 @@ body.dark-mode {
   background: rgba(255, 255, 255, 0.1);
 }
 
+#switchTabButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 28px;
+  height: 28px;
+}
+
+#switchTabButton:hover {
+  background: #f5f5f5;
+}
+
+#switchTabButton.active {
+  background: #000;
+  color: #fff;
+}
+
+#switchTabButton.active svg {
+  fill: #fff;
+}
+
+#switchTabButton svg {
+  width: 18px;
+  height: 18px;
+  fill: #000;
+}
+
+/* 深色模式 */
+.dark-mode #switchTabButton {
+  background: #2d2d2d;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.dark-mode #switchTabButton:hover {
+  background: #3d3d3d;
+}
+
+.dark-mode #switchTabButton.active {
+  background: #fff;
+  color: #000;
+}
+
+.dark-mode #switchTabButton.active svg {
+  fill: #000;
+}
+
+.dark-mode #switchTabButton svg {
+  fill: #fff;
+}
+

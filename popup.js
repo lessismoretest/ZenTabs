@@ -76,6 +76,9 @@ let selectedTabs = new Set();
 let searchTimeout = null;
 let searchInputElem = null;  // 用于存储搜索输入框元素
 
+// 添加变量来记录最近访问的两个标签页
+let lastTwoTabs = [];
+
 /**
  * 初始化应用
  */
@@ -295,6 +298,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 恢复按钮点击事件
     document.getElementById('restoreButton').addEventListener('click', restoreClosedTab);
     document.getElementById('shareButton').addEventListener('click', toggleShareMode);
+
+    // 获取当前活动的标签页
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (activeTab) {
+      lastTwoTabs.push(activeTab.id);
+    }
+
+    // 获取最后访问的标签页
+    const [lastTab] = await chrome.tabs.query({ active: false, currentWindow: true });
+    if (lastTab) {
+      lastTwoTabs.push(lastTab.id);
+    }
+
+    // 切换标签页按钮点击事件
+    document.getElementById('switchTabButton').addEventListener('click', switchBetweenTabs);
   } catch (error) {
     console.error('popup：初始化失败:', error);
   }
@@ -3594,3 +3612,91 @@ async function aiGroupTabs(tabs) {
     switchView('default');
   }
 }
+
+// 添加切换标签页功能
+async function switchBetweenTabs() {
+  try {
+    // 如果没有足够的标签页记录，直接返回
+    if (lastTwoTabs.length < 2) {
+      console.log('没有足够的标签页记录用于切换');
+      return;
+    }
+
+    const button = document.getElementById('switchTabButton');
+    // 添加激活状态
+    button.classList.add('active');
+
+    // 获取要切换到的标签页
+    const targetTabId = lastTwoTabs[1];
+
+    // 激活目标标签页
+    await chrome.tabs.update(targetTabId, { active: true });
+
+    // 交换最近两个标签页的顺序
+    [lastTwoTabs[0], lastTwoTabs[1]] = [lastTwoTabs[1], lastTwoTabs[0]];
+
+    // 300ms 后移除激活状态
+    setTimeout(() => {
+      button.classList.remove('active');
+    }, 300);
+  } catch (error) {
+    console.error('切换标签页失败:', error);
+    // 发生错误时也移除激活状态
+    const button = document.getElementById('switchTabButton');
+    button.classList.remove('active');
+  }
+}
+
+// 修改标签页激活事件监听器
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  try {
+    // 更新最近访问的标签页记录
+    const tabId = activeInfo.tabId;
+    
+    // 如果是新的标签页
+    if (!lastTwoTabs.includes(tabId)) {
+      // 将新标签页添加到开头
+      lastTwoTabs.unshift(tabId);
+      // 只保留最近的两个标签页
+      if (lastTwoTabs.length > 2) {
+        lastTwoTabs = lastTwoTabs.slice(0, 2);
+      }
+    }
+    // 如果是已存在的标签页，将其移到开头
+    else if (lastTwoTabs[1] === tabId) {
+      [lastTwoTabs[0], lastTwoTabs[1]] = [lastTwoTabs[1], lastTwoTabs[0]];
+    }
+
+    // 新高亮状态
+    document.querySelectorAll('.tab-item').forEach(item => {
+      const itemTabId = parseInt(item.getAttribute('data-tab-id'));
+      if (itemTabId === tabId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  } catch (error) {
+    console.error('处理标签页激活事件失败:', error);
+  }
+});
+
+// 在文档加载完成后初始化事件监听器
+document.addEventListener('DOMContentLoaded', async () => {
+  // ... existing code ...
+
+  // 获取当前活动的标签页
+  const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (activeTab) {
+    lastTwoTabs.push(activeTab.id);
+  }
+
+  // 获取最后访问的标签页
+  const [lastTab] = await chrome.tabs.query({ active: false, currentWindow: true });
+  if (lastTab) {
+    lastTwoTabs.push(lastTab.id);
+  }
+
+  // 切换标签页按钮点击事件
+  document.getElementById('switchTabButton').addEventListener('click', switchBetweenTabs);
+});
