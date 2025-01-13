@@ -347,6 +347,7 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  align-items: center;
 }
 
 .settings-footer button {
@@ -3239,5 +3240,38 @@ body.dark-mode {
 
 .dark-mode #switchTabButton svg {
   fill: #fff;
+}
+
+/* GitHub 链接样式 */
+.github-link {
+  margin-right: auto;
+}
+
+.github-link a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.github-link a:hover {
+  color: #000;
+}
+
+.github-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 深色模式 GitHub 链接样式 */
+.dark-mode .github-link a {
+  color: #999;
+}
+
+.dark-mode .github-link a:hover {
+  color: #fff;
 }
 
