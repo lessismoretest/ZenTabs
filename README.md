@@ -10,6 +10,9 @@
 
 MinimalTabs 是一个简洁优雅的 Chrome 标签页管理器，专注于提供流畅的用户体验和高效的标签页管理功能。无论是日常浏览还是工作研究，都能帮助你更好地组织和管理浏览器标签页。
 
+## 🎥 视频介绍（点击图片跳转 YouTube）
+[![Watch the video](https://img.youtube.com/vi/GHO-FDbZdk0/maxresdefault.jpg)](https://www.youtube.com/watch?v=GHO-FDbZdk0)
+
 
 ## 📸 应用截图
 
