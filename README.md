@@ -82,7 +82,7 @@ MinimalTabs 是一个简洁优雅的 Chrome 标签页管理器，专注于提供
 ## 🚀 使用方法
 
 1. 安装方式：
-   - 通过 Chrome 网上应用店安装
+   - 通过 Chrome 网上应用店安装  https://chromewebstore.google.com/detail/minimaltabs/eiimeonheegbjifjlappnioeoeekjfbg
    - 下载 Release 版本手动安装
    
 2. 基础操作：
